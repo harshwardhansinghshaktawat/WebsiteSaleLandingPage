@@ -7,7 +7,8 @@ class SaleLandingPage extends HTMLElement {
       titleText: 'Exclusive Spring Sale <br>Up To 70% Off',
       subtitleText: 'Don\'t miss out on our biggest sale of the season.',
       discountText: '-70%',
-      countdownTime: '07:00:00:00', // Default: 7 days
+      countdownTime: '07:00:00:00', // Duration in DD:HH:MM:SS
+      countdownStart: '', // UTC timestamp when countdown starts, set via panel
       primaryColor: '#ff3366',
       secondaryColor: '#5e17eb',
       accentColor: '#00c9ff',
@@ -30,7 +31,7 @@ class SaleLandingPage extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-time',
+      'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-time', 'countdown-start',
       'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'countdown-font-size',
       'badge-font-family', 'title-font-family', 'subtitle-font-family', 'discount-font-family',
@@ -290,6 +291,7 @@ class SaleLandingPage extends HTMLElement {
         this.shadowRoot.querySelector('.discount-pill').textContent = this.settings.discountText;
         break;
       case 'countdown-time':
+      case 'countdown-start':
         this.initCountdown();
         break;
       case 'title-font-size':
@@ -395,26 +397,17 @@ class SaleLandingPage extends HTMLElement {
     const countdownEl = this.shadowRoot.getElementById('countdown');
     if (!countdownEl) return;
 
-    let endDate = sessionStorage.getItem('countdownEndDate');
-    const storedCountdownTime = sessionStorage.getItem('lastCountdownTime');
-    const currentCountdownTime = this.settings.countdownTime;
+    // Parse countdown duration (DD:HH:MM:SS)
+    const [days, hours, minutes, seconds] = this.settings.countdownTime.split(':').map(Number);
+    const durationSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
 
-    // If no end date exists or the countdown time has changed, reset the end date
-    if (!endDate || storedCountdownTime !== currentCountdownTime) {
-      const now = new Date(); // Browser's local time
-      const [days, hours, minutes, seconds] = currentCountdownTime.split(':').map(Number);
-      const totalSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
-
-      endDate = new Date(now.getTime() + totalSeconds * 1000);
-      sessionStorage.setItem('countdownEndDate', endDate.toISOString());
-      sessionStorage.setItem('lastCountdownTime', currentCountdownTime);
-    } else {
-      endDate = new Date(endDate); // Use stored end date
-    }
+    // Get start time from settings (UTC timestamp), default to now if not set
+    let startTime = this.settings.countdownStart ? new Date(this.settings.countdownStart) : new Date();
+    const endTime = new Date(startTime.getTime() + durationSeconds * 1000);
 
     const updateCountdown = () => {
-      const currentDate = new Date(); // Browser's local time
-      const totalSeconds = (endDate - currentDate) / 1000;
+      const currentTime = new Date(); // Visitor's local time
+      const totalSeconds = (endTime - currentTime) / 1000;
 
       if (totalSeconds <= 0) {
         clearInterval(this.countdownInterval);
@@ -422,12 +415,12 @@ class SaleLandingPage extends HTMLElement {
         return;
       }
 
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = Math.floor(totalSeconds % 60);
+      const remainingDays = Math.floor(totalSeconds / 86400);
+      const remainingHours = Math.floor((totalSeconds % 86400) / 3600);
+      const remainingMinutes = Math.floor((totalSeconds % 3600) / 60);
+      const remainingSeconds = Math.floor(totalSeconds % 60);
 
-      countdownEl.innerText = `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      countdownEl.innerText = `${String(remainingDays).padStart(2, '0')}:${String(remainingHours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
 
     updateCountdown();
