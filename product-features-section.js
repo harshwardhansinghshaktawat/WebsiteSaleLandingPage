@@ -17,17 +17,10 @@ class ProductFeaturesSection extends HTMLElement {
       mainCtaText: 'Shop Now While Supplies Last',
       mainCtaLink: '#shop-now',
       mainCtaTarget: '_self',
-      cardTitles: ['Premium Quality', 'Innovative Design', 'Exclusive Offer', 'Customer Satisfaction', 'Fast Shipping', '30-Day Guarantee'],
-      cardDescriptions: [
-        'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.',
-        'Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.',
-        'Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.',
-        'Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.',
-        'Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.',
-        'Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.'
-      ],
-      cardLinks: ['#quality', '#design', '#exclusive', '#satisfaction', '#shipping', '#guarantee'],
-      cardLinkTargets: ['_self', '_self', '_self', '_self', '_self', '_self']
+      cardTitles: 'Premium Quality,Innovative Design,Exclusive Offer,Customer Satisfaction,Fast Shipping,30-Day Guarantee',
+      cardDescriptions: 'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.,Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.,Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.,Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.,Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.,Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.',
+      cardLinks: '#quality,#design,#exclusive,#satisfaction,#shipping,#guarantee',
+      cardLinkTargets: '_self,_self,_self,_self,_self,_self'
     };
     this.render();
   }
@@ -44,7 +37,7 @@ class ProductFeaturesSection extends HTMLElement {
     if (oldValue !== newValue && this.shadowRoot) {
       const key = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
       if (['cardTitles', 'cardDescriptions', 'cardLinks', 'cardLinkTargets'].includes(key)) {
-        this.settings[key] = JSON.parse(newValue);
+        this.settings[key] = newValue ? newValue.split(',') : this.settings[key].split(',');
       } else {
         this.settings[key] = newValue;
       }
@@ -53,6 +46,11 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   render() {
+    const cardTitlesArray = this.settings.cardTitles.split(',');
+    const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
+    const cardLinksArray = this.settings.cardLinks.split(',');
+    const cardLinkTargetsArray = this.settings.cardLinkTargets.split(',');
+
     this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -290,12 +288,12 @@ class ProductFeaturesSection extends HTMLElement {
             <p class="section-subtitle">${this.settings.sectionSubtitle}</p>
           </div>
           <div class="features-grid">
-            ${this.settings.cardTitles.map((title, index) => `
+            ${cardTitlesArray.map((title, index) => `
               <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
                 <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
                 <h3 class="feature-title">${title}</h3>
-                <p class="feature-description">${this.settings.cardDescriptions[index]}</p>
-                <a href="${this.settings.cardLinks[index]}" target="${this.settings.cardLinkTargets[index]}" class="feature-cta">
+                <p class="feature-description">${cardDescriptionsArray[index]}</p>
+                <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
                   Learn more
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -380,13 +378,18 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   renderCards() {
+    const cardTitlesArray = this.settings.cardTitles.split(',');
+    const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
+    const cardLinksArray = this.settings.cardLinks.split(',');
+    const cardLinkTargetsArray = this.settings.cardLinkTargets.split(',');
+
     const grid = this.shadowRoot.querySelector('.features-grid');
-    grid.innerHTML = this.settings.cardTitles.map((title, index) => `
+    grid.innerHTML = cardTitlesArray.map((title, index) => `
       <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
         <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
         <h3 class="feature-title">${title}</h3>
-        <p class="feature-description">${this.settings.cardDescriptions[index]}</p>
-        <a href="${this.settings.cardLinks[index]}" target="${this.settings.cardLinkTargets[index]}" class="feature-cta">
+        <p class="feature-description">${cardDescriptionsArray[index]}</p>
+        <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
           Learn more
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -407,7 +410,7 @@ class ProductFeaturesSection extends HTMLElement {
       script.src = src;
       script.async = true;
       script.onload = () => {
-        if (index === 2) { // Lottie loaded last
+        if (index === 2) {
           this.loadLottieAnimations();
           this.initScrollAnimations();
         }
