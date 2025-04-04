@@ -25,21 +25,29 @@ class SaleLandingPage extends HTMLElement {
       <style>
         :host {
           --primary: ${this.getAttribute('primary-color') || '#ff3366'};
+          --primary-dark: #e61e4d;
           --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
           --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
           --text: ${this.getAttribute('text-color') || '#2d3047'};
+          --text-light: #6b7280;
           --background: ${this.getAttribute('background-color') || '#f8fafc'};
+          --white: #ffffff;
+          --black: #111111;
           --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
           --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
           --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
           --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.2);
+          display: block;
+          width: 100%;
+          height: 100vh;
         }
+        
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
-          font-family: 'Montserrat', sans-serif;
         }
+        
         .hero-section {
           position: relative;
           height: 100vh;
@@ -48,9 +56,11 @@ class SaleLandingPage extends HTMLElement {
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          background-color: var(--background);
+          font-family: ${this.getAttribute('badge-font-family') || 'Montserrat'}, sans-serif;
           color: var(--text);
+          background-color: var(--background);
         }
+        
         .webgl-background {
           position: absolute;
           top: 0;
@@ -59,6 +69,7 @@ class SaleLandingPage extends HTMLElement {
           height: 100%;
           z-index: 1;
         }
+        
         .hero-content {
           position: relative;
           z-index: 10;
@@ -69,8 +80,14 @@ class SaleLandingPage extends HTMLElement {
           background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(10px);
           box-shadow: var(--shadow-strong);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           text-align: center;
+          transform: translateY(50px);
+          opacity: 0;
         }
+        
         .sale-badge {
           background: var(--gradient-1);
           color: white;
@@ -81,10 +98,13 @@ class SaleLandingPage extends HTMLElement {
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 1.5rem;
+          transform: translateY(20px);
+          opacity: 0;
           font-family: ${this.getAttribute('badge-font-family') || 'Montserrat'};
         }
+        
         .hero-title {
-          font-family: ${this.getAttribute('title-font-family') || 'Playfair Display'};
+          font-family: ${this.getAttribute('title-font-family') || 'Playfair Display'}, serif;
           font-size: ${this.getAttribute('title-font-size') || '3.5rem'};
           font-weight: 900;
           line-height: 1.1;
@@ -93,51 +113,81 @@ class SaleLandingPage extends HTMLElement {
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
+          transform: translateY(20px);
+          opacity: 0;
         }
+        
         .hero-subtitle {
           font-family: ${this.getAttribute('subtitle-font-family') || 'Montserrat'};
           font-size: ${this.getAttribute('subtitle-font-size') || '1.25rem'};
           font-weight: 400;
           line-height: 1.6;
-          color: #6b7280;
+          color: var(--text-light);
           margin-bottom: 2rem;
           max-width: 700px;
+          transform: translateY(20px);
+          opacity: 0;
         }
+        
         .countdown-container {
           display: flex;
           gap: 1.5rem;
           margin-bottom: 2.5rem;
+          transform: translateY(20px);
+          opacity: 0;
         }
+        
         .countdown-item {
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+        
         .countdown-value {
           font-size: ${this.getAttribute('countdown-font-size') || '2.5rem'};
           font-weight: 700;
           color: var(--text);
           width: 5rem;
           height: 5rem;
-          background-color: #ffffff;
+          background-color: var(--white);
           border-radius: 0.75rem;
           box-shadow: var(--shadow);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: 0.5rem;
+          position: relative;
+          overflow: hidden;
         }
+        
+        .countdown-value::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: var(--gradient-1);
+        }
+        
         .countdown-label {
           font-size: 0.875rem;
           text-transform: uppercase;
           letter-spacing: 1px;
-          color: #6b7280;
+          color: var(--text-light);
         }
+        
         .cta-buttons {
           display: flex;
           gap: 1rem;
+          transform: translateY(20px);
+          opacity: 0;
         }
+        
         .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           padding: 1rem 2rem;
           border-radius: 0.5rem;
           font-weight: 600;
@@ -146,15 +196,32 @@ class SaleLandingPage extends HTMLElement {
           transition: all 0.3s ease;
           cursor: pointer;
         }
+        
         .btn-primary {
           background: var(--primary);
           color: white;
+          box-shadow: 0 10px 20px rgba(255, 51, 102, 0.3);
         }
+        
+        .btn-primary:hover {
+          background: var(--primary-dark);
+          transform: translateY(-3px);
+          box-shadow: 0 15px 30px rgba(255, 51, 102, 0.4);
+        }
+        
         .btn-secondary {
           background: transparent;
           color: var(--text);
-          border: 2px solid #6b7280;
+          border: 2px solid var(--text-light);
         }
+        
+        .btn-secondary:hover {
+          background: var(--text);
+          color: white;
+          border-color: var(--text);
+          transform: translateY(-3px);
+        }
+        
         .discount-pill {
           position: absolute;
           top: -2rem;
@@ -170,9 +237,27 @@ class SaleLandingPage extends HTMLElement {
           align-items: center;
           justify-content: center;
           z-index: 20;
-          box-shadow: var(--shadow);
+          box-shadow: 0 10px 30px rgba(94, 23, 235, 0.4);
+          animation: pulse 2s infinite;
+          transform: scale(0);
           font-family: ${this.getAttribute('discount-font-family') || 'Montserrat'};
         }
+        
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            box-shadow: 0 10px 30px rgba(94, 23, 235, 0.4);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(94, 23, 235, 0.5);
+          }
+          100% {
+            transform: scale(1);
+            box-shadow: 0 10px 30px rgba(94, 23, 235, 0.4);
+          }
+        }
+        
         .shape {
           position: absolute;
           border-radius: 50%;
@@ -181,12 +266,14 @@ class SaleLandingPage extends HTMLElement {
           opacity: 0.3;
           z-index: 0;
         }
+        
         .shape-1 {
           width: 500px;
           height: 500px;
           top: -200px;
           left: -200px;
         }
+        
         .shape-2 {
           width: 300px;
           height: 300px;
@@ -194,7 +281,66 @@ class SaleLandingPage extends HTMLElement {
           right: -100px;
           background: var(--gradient-1);
         }
+        
+        @media (max-width: 768px) {
+          .hero-title {
+            font-size: 2.5rem;
+          }
+          
+          .hero-content {
+            padding: 2rem;
+          }
+          
+          .countdown-container {
+            gap: 0.75rem;
+          }
+          
+          .countdown-value {
+            font-size: 1.75rem;
+            width: 4rem;
+            height: 4rem;
+          }
+          
+          .cta-buttons {
+            flex-direction: column;
+          }
+          
+          .discount-pill {
+            width: 80px;
+            height: 80px;
+            font-size: 1rem;
+            top: -1rem;
+            right: -1rem;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .hero-title {
+            font-size: 2rem;
+          }
+          
+          .hero-subtitle {
+            font-size: 1rem;
+          }
+          
+          .countdown-container {
+            gap: 0.5rem;
+          }
+          
+          .countdown-value {
+            font-size: 1.5rem;
+            width: 3.5rem;
+            height: 3.5rem;
+          }
+          
+          .countdown-label {
+            font-size: 0.75rem;
+          }
+        }
       </style>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
       <section class="hero-section">
         <div class="webgl-background" id="webgl-background"></div>
         <div class="shape shape-1"></div>
@@ -202,7 +348,7 @@ class SaleLandingPage extends HTMLElement {
         <div class="hero-content">
           <div class="sale-badge">${this.getAttribute('badge-text') || 'Limited Time Offer'}</div>
           <h1 class="hero-title">${this.getAttribute('title-text') || 'Exclusive Spring Sale <br>Up To 70% Off'}</h1>
-          <p class="hero-subtitle">${this.getAttribute('subtitle-text') || 'Don\'t miss out on our biggest sale of the season.'}</p>
+          <p class="hero-subtitle">${this.getAttribute('subtitle-text') || 'Don\'t miss out on our biggest sale of the season. Premium quality products at unbeatable prices, available for a limited time only.'}</p>
           <div class="countdown-container">
             <div class="countdown-item">
               <div class="countdown-value" id="days">00</div>
@@ -232,6 +378,7 @@ class SaleLandingPage extends HTMLElement {
 
     this.loadScripts();
     this.initCountdown();
+    this.initAnimations();
   }
 
   loadScripts() {
@@ -245,7 +392,7 @@ class SaleLandingPage extends HTMLElement {
       script.src = src;
       script.onload = () => {
         if (src.includes('three.min.js')) this.initWebGLBackground();
-        if (src.includes('gsap.min.js')) this.initAnimations();
+        // Animations are initialized after render
       };
       this.shadowRoot.appendChild(script);
     });
@@ -257,6 +404,7 @@ class SaleLandingPage extends HTMLElement {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
     const particlesGeometry = new THREE.BufferGeometry();
@@ -286,10 +434,26 @@ class SaleLandingPage extends HTMLElement {
     scene.add(particlesMesh);
     camera.position.z = 5;
 
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener('mousemove', (event) => {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    });
+
     const animate = () => {
       requestAnimationFrame(animate);
       particlesMesh.rotation.x += 0.0005;
       particlesMesh.rotation.y += 0.0005;
+      particlesMesh.rotation.x += mouseY * 0.0005;
+      particlesMesh.rotation.y += mouseX * 0.0005;
       renderer.render(scene, camera);
     };
     animate();
@@ -311,6 +475,10 @@ class SaleLandingPage extends HTMLElement {
 
       if (totalSeconds <= 0) {
         clearInterval(interval);
+        daysEl.innerText = '00';
+        hoursEl.innerText = '00';
+        minutesEl.innerText = '00';
+        secondsEl.innerText = '00';
         return;
       }
 
@@ -330,17 +498,110 @@ class SaleLandingPage extends HTMLElement {
   }
 
   initAnimations() {
-    gsap.to(this.shadowRoot.querySelector('.hero-content'), { opacity: 1, y: 0, duration: 1 });
-    gsap.to(this.shadowRoot.querySelector('.sale-badge'), { opacity: 1, y: 0, duration: 0.8, delay: 0.3 });
-    gsap.to(this.shadowRoot.querySelector('.hero-title'), { opacity: 1, y: 0, duration: 0.8, delay: 0.5 });
-    gsap.to(this.shadowRoot.querySelector('.hero-subtitle'), { opacity: 1, y: 0, duration: 0.8, delay: 0.7 });
-    gsap.to(this.shadowRoot.querySelector('.countdown-container'), { opacity: 1, y: 0, duration: 0.8, delay: 0.9 });
-    gsap.to(this.shadowRoot.querySelector('.cta-buttons'), { opacity: 1, y: 0, duration: 0.8, delay: 1.1 });
-    gsap.to(this.shadowRoot.querySelector('.discount-pill'), { scale: 1, duration: 0.8, delay: 1.3, ease: 'back.out(1.7)' });
+    const gsap = this.shadowRoot.host.ownerDocument.defaultView.gsap;
+    if (!gsap) return; // Ensure GSAP is loaded
+    gsap.registerPlugin(this.shadowRoot.host.ownerDocument.defaultView.ScrollTrigger);
+
+    gsap.to(this.shadowRoot.querySelector('.hero-content'), {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.sale-badge'), {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      delay: 0.3,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.hero-title'), {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      delay: 0.5,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.hero-subtitle'), {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      delay: 0.7,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.countdown-container'), {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      delay: 0.9,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.cta-buttons'), {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      delay: 1.1,
+      ease: 'power3.out'
+    });
+
+    gsap.to(this.shadowRoot.querySelector('.discount-pill'), {
+      scale: 1,
+      duration: 0.8,
+      delay: 1.3,
+      ease: 'back.out(1.7)'
+    });
   }
 
   updateStyles() {
-    this.render();
+    // Update specific elements instead of re-rendering everything
+    const rootStyle = this.shadowRoot.querySelector('style');
+    rootStyle.textContent = rootStyle.textContent.replace(
+      /:host\s*{[^}]*}/,
+      `:host {
+        --primary: ${this.getAttribute('primary-color') || '#ff3366'};
+        --primary-dark: #e61e4d;
+        --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
+        --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
+        --text: ${this.getAttribute('text-color') || '#2d3047'};
+        --text-light: #6b7280;
+        --background: ${this.getAttribute('background-color') || '#f8fafc'};
+        --white: #ffffff;
+        --black: #111111;
+        --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.2);
+        display: block;
+        width: 100%;
+        height: 100vh;
+      }`
+    );
+
+    this.shadowRoot.querySelector('.sale-badge').textContent = this.getAttribute('badge-text') || 'Limited Time Offer';
+    this.shadowRoot.querySelector('.sale-badge').style.fontFamily = this.getAttribute('badge-font-family') || 'Montserrat';
+
+    this.shadowRoot.querySelector('.hero-title').innerHTML = this.getAttribute('title-text') || 'Exclusive Spring Sale <br>Up To 70% Off';
+    this.shadowRoot.querySelector('.hero-title').style.fontFamily = this.getAttribute('title-font-family') || 'Playfair Display';
+    this.shadowRoot.querySelector('.hero-title').style.fontSize = this.getAttribute('title-font-size') || '3.5rem';
+
+    this.shadowRoot.querySelector('.hero-subtitle').textContent = this.getAttribute('subtitle-text') || 'Don\'t miss out on our biggest sale of the season. Premium quality products at unbeatable prices, available for a limited time only.';
+    this.shadowRoot.querySelector('.hero-subtitle').style.fontFamily = this.getAttribute('subtitle-font-family') || 'Montserrat';
+    this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = this.getAttribute('subtitle-font-size') || '1.25rem';
+
+    this.shadowRoot.querySelector('.discount-pill').textContent = this.getAttribute('discount-text') || '-70%';
+    this.shadowRoot.querySelector('.discount-pill').style.fontFamily = this.getAttribute('discount-font-family') || 'Montserrat';
+
+    const countdownValues = this.shadowRoot.querySelectorAll('.countdown-value');
+    countdownValues.forEach(value => {
+      value.style.fontSize = this.getAttribute('countdown-font-size') || '2.5rem';
+    });
+
+    this.shadowRoot.querySelector('.hero-section').style.backgroundColor = this.getAttribute('background-color') || '#f8fafc';
   }
 }
 
