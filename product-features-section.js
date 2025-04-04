@@ -27,13 +27,11 @@ class ProductFeaturesSection extends HTMLElement {
       cardLinkTargets: '_self,_self,_self,_self,_self,_self',
       cardIcons: 'https://assets6.lottiefiles.com/packages/lf20_fo0ta0sy.json,https://assets5.lottiefiles.com/packages/lf20_kkflmtur.json,https://assets1.lottiefiles.com/packages/lf20_kxvke5qf.json,https://assets5.lottiefiles.com/packages/lf20_nc3vxahm.json,https://assets3.lottiefiles.com/packages/lf20_urbk83vw.json,https://assets10.lottiefiles.com/packages/lf20_ybfz1vfm.json'
     };
-    this.isReady = false; // Flag to track script loading
-    this.render();
     this.loadScripts().then(() => {
-      this.isReady = true;
+      this.render();
       this.loadLottieAnimations();
       this.initScrollAnimations();
-    });
+    }).catch(err => console.error('Script loading failed:', err));
   }
 
   static get observedAttributes() {
@@ -82,10 +80,6 @@ class ProductFeaturesSection extends HTMLElement {
           display: block;
           width: 100%;
           font-family: 'Montserrat', sans-serif;
-        }
-        /* Hide content until scripts are loaded */
-        .features-section:not(.loaded) {
-          visibility: hidden;
         }
         * {
           margin: 0;
@@ -331,8 +325,6 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   updateElement(name) {
-    if (!this.isReady) return; // Skip updates until scripts are loaded
-
     const rootStyle = this.shadowRoot.querySelector('style');
     if (rootStyle) {
       rootStyle.textContent = rootStyle.textContent.replace(
@@ -434,30 +426,33 @@ class ProductFeaturesSection extends HTMLElement {
     }
   }
 
-  async loadScripts() {
+  loadScripts() {
     const scripts = [
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js'
     ];
 
-    const loadScript = (src) => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        script.onload = resolve;
-        script.onerror = reject;
-        this.shadowRoot.appendChild(script);
-      });
-    };
-
-    await Promise.all(scripts.map(src => loadScript(src)));
-    this.shadowRoot.querySelector('.features-section').classList.add('loaded');
+    return Promise.all(
+      scripts.map(src => {
+        return new Promise((resolve, reject) => {
+          if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+          }
+          const script = document.createElement('script');
+          script.src = src;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      })
+    );
   }
 
   loadLottieAnimations() {
-    if (!window.lottie || !this.isReady) return;
+    if (!window.lottie) return;
     const cardIconsArray = this.settings.cardIcons.split(',');
     cardIconsArray.forEach((path, index) => {
       const container = this.shadowRoot.getElementById(`feature-icon-${index + 1}`);
@@ -474,10 +469,7 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   initScrollAnimations() {
-    if (!this.isReady) return;
-    const gsap = this.shadowRoot.host.ownerDocument.defaultView.gsap;
-    const ScrollTrigger = this.shadowRoot.host.ownerDocument.defaultView.ScrollTrigger;
-    if (!gsap || !ScrollTrigger) return;
+    if (!window.gsap || !window.ScrollTrigger) return;
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -485,8 +477,7 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.section-title'),
         start: 'top 80%',
-        toggleClass: 'reveal',
-        once: false
+        toggleClass: 'reveal'
       }
     });
 
@@ -494,8 +485,7 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.section-subtitle'),
         start: 'top 80%',
-        toggleClass: 'reveal',
-        once: false
+        toggleClass: 'reveal'
       }
     });
 
@@ -508,8 +498,7 @@ class ProductFeaturesSection extends HTMLElement {
           start: 'top 85%',
           onEnter: () => {
             setTimeout(() => card.classList.add('reveal'), delay * 1000);
-          },
-          once: false
+          }
         }
       });
     });
@@ -518,8 +507,7 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.cta-container'),
         start: 'top 85%',
-        toggleClass: 'reveal',
-        once: false
+        toggleClass: 'reveal'
       }
     });
   }
