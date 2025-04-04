@@ -2,6 +2,25 @@ class SaleLandingPage extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.settings = {
+      badgeText: 'Limited Time Offer',
+      titleText: 'Exclusive Spring Sale <br>Up To 70% Off',
+      subtitleText: 'Don\'t miss out on our biggest sale of the season.',
+      discountText: '-70%',
+      countdownDays: '7',
+      primaryColor: '#ff3366',
+      secondaryColor: '#5e17eb',
+      accentColor: '#00c9ff',
+      textColor: '#2d3047',
+      backgroundColor: '#f8fafc',
+      titleFontSize: '3.5rem',
+      subtitleFontSize: '1.25rem',
+      countdownFontSize: '2.5rem',
+      badgeFontFamily: 'Montserrat',
+      titleFontFamily: 'Playfair Display',
+      subtitleFontFamily: 'Montserrat',
+      discountFontFamily: 'Montserrat'
+    };
     this.render();
   }
 
@@ -16,7 +35,9 @@ class SaleLandingPage extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.shadowRoot) {
-      this.updateElement(name, newValue);
+      const key = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      this.settings[key] = newValue || this.settings[key];
+      this.updateElement(name);
     }
   }
 
@@ -24,11 +45,11 @@ class SaleLandingPage extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          --primary: ${this.getAttribute('primary-color') || '#ff3366'};
-          --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
-          --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
-          --text: ${this.getAttribute('text-color') || '#2d3047'};
-          --background: ${this.getAttribute('background-color') || '#f8fafc'};
+          --primary: ${this.settings.primaryColor};
+          --secondary: ${this.settings.secondaryColor};
+          --accent: ${this.settings.accentColor};
+          --text: ${this.settings.textColor};
+          --background: ${this.settings.backgroundColor};
           --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
           --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
           --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -89,11 +110,11 @@ class SaleLandingPage extends HTMLElement {
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 1.5rem;
-          font-family: ${this.getAttribute('badge-font-family') || 'Montserrat'};
+          font-family: ${this.settings.badgeFontFamily};
         }
         .hero-title {
-          font-family: ${this.getAttribute('title-font-family') || 'Playfair Display'};
-          font-size: ${this.getAttribute('title-font-size') || '3.5rem'};
+          font-family: ${this.settings.titleFontFamily};
+          font-size: ${this.settings.titleFontSize};
           font-weight: 900;
           line-height: 1.1;
           margin-bottom: 1.5rem;
@@ -103,8 +124,8 @@ class SaleLandingPage extends HTMLElement {
           color: transparent;
         }
         .hero-subtitle {
-          font-family: ${this.getAttribute('subtitle-font-family') || 'Montserrat'};
-          font-size: ${this.getAttribute('subtitle-font-size') || '1.25rem'};
+          font-family: ${this.settings.subtitleFontFamily};
+          font-size: ${this.settings.subtitleFontSize};
           font-weight: 400;
           line-height: 1.6;
           color: #6b7280;
@@ -123,7 +144,7 @@ class SaleLandingPage extends HTMLElement {
           align-items: center;
         }
         .countdown-value {
-          font-size: ${this.getAttribute('countdown-font-size') || '2.5rem'};
+          font-size: ${this.settings.countdownFontSize};
           font-weight: 700;
           color: var(--text);
           width: 5rem;
@@ -182,7 +203,7 @@ class SaleLandingPage extends HTMLElement {
           justify-content: center;
           z-index: 20;
           box-shadow: var(--shadow);
-          font-family: ${this.getAttribute('discount-font-family') || 'Montserrat'};
+          font-family: ${this.settings.discountFontFamily};
         }
         .shape {
           position: absolute;
@@ -226,9 +247,9 @@ class SaleLandingPage extends HTMLElement {
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
         <div class="hero-content">
-          <div class="sale-badge">${this.getAttribute('badge-text') || 'Limited Time Offer'}</div>
-          <h1 class="hero-title">${this.getAttribute('title-text') || 'Exclusive Spring Sale <br>Up To 70% Off'}</h1>
-          <p class="hero-subtitle">${this.getAttribute('subtitle-text') || 'Don\'t miss out on our biggest sale of the season.'}</p>
+          <div class="sale-badge">${this.settings.badgeText}</div>
+          <h1 class="hero-title">${this.settings.titleText}</h1>
+          <p class="hero-subtitle">${this.settings.subtitleText}</p>
           <div class="countdown-container">
             <div class="countdown-item">
               <div class="countdown-value" id="days">00</div>
@@ -251,7 +272,7 @@ class SaleLandingPage extends HTMLElement {
             <a href="#products" class="btn btn-primary">Shop Now</a>
             <a href="#learn-more" class="btn btn-secondary">Learn More</a>
           </div>
-          <div class="discount-pill">${this.getAttribute('discount-text') || '-70%'}</div>
+          <div class="discount-pill">${this.settings.discountText}</div>
         </div>
       </section>
     `;
@@ -261,17 +282,17 @@ class SaleLandingPage extends HTMLElement {
     this.initAnimations();
   }
 
-  updateElement(name, value) {
+  updateElement(name) {
     const rootStyle = this.shadowRoot.querySelector('style');
     if (rootStyle) {
       rootStyle.textContent = rootStyle.textContent.replace(
         /:host\s*{[^}]*}/,
         `:host {
-          --primary: ${this.getAttribute('primary-color') || '#ff3366'};
-          --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
-          --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
-          --text: ${this.getAttribute('text-color') || '#2d3047'};
-          --background: ${this.getAttribute('background-color') || '#f8fafc'};
+          --primary: ${this.settings.primaryColor};
+          --secondary: ${this.settings.secondaryColor};
+          --accent: ${this.settings.accentColor};
+          --text: ${this.settings.textColor};
+          --background: ${this.settings.backgroundColor};
           --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
           --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
           --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -286,40 +307,40 @@ class SaleLandingPage extends HTMLElement {
 
     switch (name) {
       case 'badge-text':
-        this.shadowRoot.querySelector('.sale-badge').textContent = value || 'Limited Time Offer';
+        this.shadowRoot.querySelector('.sale-badge').textContent = this.settings.badgeText;
         break;
       case 'title-text':
-        this.shadowRoot.querySelector('.hero-title').innerHTML = value || 'Exclusive Spring Sale <br>Up To 70% Off';
+        this.shadowRoot.querySelector('.hero-title').innerHTML = this.settings.titleText;
         break;
       case 'subtitle-text':
-        this.shadowRoot.querySelector('.hero-subtitle').textContent = value || 'Don\'t miss out on our biggest sale of the season.';
+        this.shadowRoot.querySelector('.hero-subtitle').textContent = this.settings.subtitleText;
         break;
       case 'discount-text':
-        this.shadowRoot.querySelector('.discount-pill').textContent = value || '-70%';
+        this.shadowRoot.querySelector('.discount-pill').textContent = this.settings.discountText;
         break;
       case 'countdown-days':
         this.initCountdown();
         break;
       case 'title-font-size':
-        this.shadowRoot.querySelector('.hero-title').style.fontSize = value || '3.5rem';
+        this.shadowRoot.querySelector('.hero-title').style.fontSize = this.settings.titleFontSize;
         break;
       case 'subtitle-font-size':
-        this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = value || '1.25rem';
+        this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = this.settings.subtitleFontSize;
         break;
       case 'countdown-font-size':
-        this.shadowRoot.querySelectorAll('.countdown-value').forEach(el => el.style.fontSize = value || '2.5rem');
+        this.shadowRoot.querySelectorAll('.countdown-value').forEach(el => el.style.fontSize = this.settings.countdownFontSize);
         break;
       case 'badge-font-family':
-        this.shadowRoot.querySelector('.sale-badge').style.fontFamily = value || 'Montserrat';
+        this.shadowRoot.querySelector('.sale-badge').style.fontFamily = this.settings.badgeFontFamily;
         break;
       case 'title-font-family':
-        this.shadowRoot.querySelector('.hero-title').style.fontFamily = value || 'Playfair Display';
+        this.shadowRoot.querySelector('.hero-title').style.fontFamily = this.settings.titleFontFamily;
         break;
       case 'subtitle-font-family':
-        this.shadowRoot.querySelector('.hero-subtitle').style.fontFamily = value || 'Montserrat';
+        this.shadowRoot.querySelector('.hero-subtitle').style.fontFamily = this.settings.subtitleFontFamily;
         break;
       case 'discount-font-family':
-        this.shadowRoot.querySelector('.discount-pill').style.fontFamily = value || 'Montserrat';
+        this.shadowRoot.querySelector('.discount-pill').style.fontFamily = this.settings.discountFontFamily;
         break;
     }
   }
@@ -368,7 +389,7 @@ class SaleLandingPage extends HTMLElement {
 
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.03,
-      color: this.getAttribute('secondary-color') || '#5e17eb',
+      color: this.settings.secondaryColor,
       transparent: true,
       opacity: 0.8,
       blending: THREE.AdditiveBlending
@@ -388,7 +409,7 @@ class SaleLandingPage extends HTMLElement {
   }
 
   initCountdown() {
-    const countdownDays = parseInt(this.getAttribute('countdown-days')) || 7;
+    const countdownDays = parseInt(this.settings.countdownDays) || 7;
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + countdownDays);
 
