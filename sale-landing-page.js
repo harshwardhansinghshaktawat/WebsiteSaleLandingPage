@@ -392,23 +392,25 @@ class SaleLandingPage extends HTMLElement {
   }
 
   initCountdown() {
-    let endDate = sessionStorage.getItem('countdownEndDate');
-    const now = new Date(); // Browser's local time
-
-    if (!endDate || this.settings.countdownTime !== sessionStorage.getItem('lastCountdownTime')) {
-      // Parse DD:HH:MM:SS format
-      const [days, hours, minutes, seconds] = this.settings.countdownTime.split(':').map(Number);
-      const totalSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
-
-      endDate = new Date(now.getTime() + totalSeconds * 1000); // Set end date from now
-      sessionStorage.setItem('countdownEndDate', endDate.toISOString());
-      sessionStorage.setItem('lastCountdownTime', this.settings.countdownTime);
-    } else {
-      endDate = new Date(endDate);
-    }
-
     const countdownEl = this.shadowRoot.getElementById('countdown');
     if (!countdownEl) return;
+
+    let endDate = sessionStorage.getItem('countdownEndDate');
+    const storedCountdownTime = sessionStorage.getItem('lastCountdownTime');
+    const currentCountdownTime = this.settings.countdownTime;
+
+    // If no end date exists or the countdown time has changed, reset the end date
+    if (!endDate || storedCountdownTime !== currentCountdownTime) {
+      const now = new Date(); // Browser's local time
+      const [days, hours, minutes, seconds] = currentCountdownTime.split(':').map(Number);
+      const totalSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
+
+      endDate = new Date(now.getTime() + totalSeconds * 1000);
+      sessionStorage.setItem('countdownEndDate', endDate.toISOString());
+      sessionStorage.setItem('lastCountdownTime', currentCountdownTime);
+    } else {
+      endDate = new Date(endDate); // Use stored end date
+    }
 
     const updateCountdown = () => {
       const currentDate = new Date(); // Browser's local time
