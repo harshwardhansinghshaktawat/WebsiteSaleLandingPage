@@ -192,7 +192,7 @@ class SaleLandingPage extends HTMLElement {
           height: 300px;
           bottom: -150px;
           right: -100px;
-          background: var(--gradient-1);
+          background: var(--gradient-1 Wix Blocks);
         }
       </style>
       <section class="hero-section">
