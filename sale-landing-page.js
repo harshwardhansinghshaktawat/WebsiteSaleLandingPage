@@ -19,7 +19,11 @@ class SaleLandingPage extends HTMLElement {
       badgeFontFamily: 'Montserrat',
       titleFontFamily: 'Playfair Display',
       subtitleFontFamily: 'Montserrat',
-      discountFontFamily: 'Montserrat'
+      discountFontFamily: 'Montserrat',
+      shopNowLink: '#products',
+      learnMoreLink: '#learn-more',
+      shopNowTarget: '_self',
+      learnMoreTarget: '_self'
     };
     this.render();
   }
@@ -29,7 +33,8 @@ class SaleLandingPage extends HTMLElement {
       'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-days',
       'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'countdown-font-size',
-      'badge-font-family', 'title-font-family', 'subtitle-font-family', 'discount-font-family'
+      'badge-font-family', 'title-font-family', 'subtitle-font-family', 'discount-font-family',
+      'shop-now-link', 'learn-more-link', 'shop-now-target', 'learn-more-target'
     ];
   }
 
@@ -134,34 +139,18 @@ class SaleLandingPage extends HTMLElement {
         }
         .countdown-container {
           display: flex;
-          gap: 1.5rem;
+          gap: 1rem;
           margin-bottom: 2.5rem;
           justify-content: center;
-        }
-        .countdown-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .countdown-value {
           font-size: ${this.settings.countdownFontSize};
           font-weight: 700;
           color: var(--text);
-          width: 5rem;
-          height: 5rem;
+        }
+        .countdown-value {
           background-color: #ffffff;
           border-radius: 0.75rem;
           box-shadow: var(--shadow);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 0.5rem;
-        }
-        .countdown-label {
-          font-size: 0.875rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #6b7280;
+          padding: 0.5rem 1rem;
         }
         .cta-buttons {
           display: flex;
@@ -229,17 +218,14 @@ class SaleLandingPage extends HTMLElement {
         @media (max-width: 768px) {
           .hero-title { font-size: 2.5rem; }
           .hero-content { padding: 2rem; }
-          .countdown-container { gap: 0.75rem; }
-          .countdown-value { font-size: 1.75rem; width: 4rem; height: 4rem; }
+          .countdown-container { font-size: 1.75rem; }
           .cta-buttons { flex-direction: column; }
           .discount-pill { width: 80px; height: 80px; font-size: 1rem; top: -1rem; right: -1rem; }
         }
         @media (max-width: 480px) {
           .hero-title { font-size: 2rem; }
           .hero-subtitle { font-size: 1rem; }
-          .countdown-container { gap: 0.5rem; }
-          .countdown-value { font-size: 1.5rem; width: 3.5rem; height: 3.5rem; }
-          .countdown-label { font-size: 0.75rem; }
+          .countdown-container { font-size: 1.5rem; }
         }
       </style>
       <section class="hero-section">
@@ -251,26 +237,11 @@ class SaleLandingPage extends HTMLElement {
           <h1 class="hero-title">${this.settings.titleText}</h1>
           <p class="hero-subtitle">${this.settings.subtitleText}</p>
           <div class="countdown-container">
-            <div class="countdown-item">
-              <div class="countdown-value" id="days">00</div>
-              <div class="countdown-label">Days</div>
-            </div>
-            <div class="countdown-item">
-              <div class="countdown-value" id="hours">00</div>
-              <div class="countdown-label">Hours</div>
-            </div>
-            <div class="countdown-item">
-              <div class="countdown-value" id="minutes">00</div>
-              <div class="countdown-label">Minutes</div>
-            </div>
-            <div class="countdown-item">
-              <div class="countdown-value" id="seconds">00</div>
-              <div class="countdown-label">Seconds</div>
-            </div>
+            <div class="countdown-value" id="countdown">00:00:00:00</div>
           </div>
           <div class="cta-buttons">
-            <a href="#products" class="btn btn-primary">Shop Now</a>
-            <a href="#learn-more" class="btn btn-secondary">Learn More</a>
+            <a href="${this.settings.shopNowLink}" target="${this.settings.shopNowTarget}" class="btn btn-primary">Shop Now</a>
+            <a href="${this.settings.learnMoreLink}" target="${this.settings.learnMoreTarget}" class="btn btn-secondary">Learn More</a>
           </div>
           <div class="discount-pill">${this.settings.discountText}</div>
         </div>
@@ -328,7 +299,7 @@ class SaleLandingPage extends HTMLElement {
         this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = this.settings.subtitleFontSize;
         break;
       case 'countdown-font-size':
-        this.shadowRoot.querySelectorAll('.countdown-value').forEach(el => el.style.fontSize = this.settings.countdownFontSize);
+        this.shadowRoot.querySelector('.countdown-container').style.fontSize = this.settings.countdownFontSize;
         break;
       case 'badge-font-family':
         this.shadowRoot.querySelector('.sale-badge').style.fontFamily = this.settings.badgeFontFamily;
@@ -341,6 +312,18 @@ class SaleLandingPage extends HTMLElement {
         break;
       case 'discount-font-family':
         this.shadowRoot.querySelector('.discount-pill').style.fontFamily = this.settings.discountFontFamily;
+        break;
+      case 'shop-now-link':
+        this.shadowRoot.querySelector('.btn-primary').href = this.settings.shopNowLink;
+        break;
+      case 'learn-more-link':
+        this.shadowRoot.querySelector('.btn-secondary').href = this.settings.learnMoreLink;
+        break;
+      case 'shop-now-target':
+        this.shadowRoot.querySelector('.btn-primary').target = this.settings.shopNowTarget;
+        break;
+      case 'learn-more-target':
+        this.shadowRoot.querySelector('.btn-secondary').target = this.settings.learnMoreTarget;
         break;
     }
   }
@@ -409,27 +392,25 @@ class SaleLandingPage extends HTMLElement {
   }
 
   initCountdown() {
-    const countdownDays = parseInt(this.settings.countdownDays) || 7;
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + countdownDays);
+    let endDate = sessionStorage.getItem('countdownEndDate');
+    if (!endDate) {
+      endDate = new Date();
+      endDate.setDate(endDate.getDate() + parseInt(this.settings.countdownDays));
+      sessionStorage.setItem('countdownEndDate', endDate.toISOString());
+    } else {
+      endDate = new Date(endDate);
+    }
 
-    const daysEl = this.shadowRoot.getElementById('days');
-    const hoursEl = this.shadowRoot.getElementById('hours');
-    const minutesEl = this.shadowRoot.getElementById('minutes');
-    const secondsEl = this.shadowRoot.getElementById('seconds');
-
-    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+    const countdownEl = this.shadowRoot.getElementById('countdown');
+    if (!countdownEl) return;
 
     const updateCountdown = () => {
       const currentDate = new Date();
       const totalSeconds = (endDate - currentDate) / 1000;
 
       if (totalSeconds <= 0) {
-        clearInterval(interval);
-        daysEl.innerText = '00';
-        hoursEl.innerText = '00';
-        minutesEl.innerText = '00';
-        secondsEl.innerText = '00';
+        clearInterval(this.countdownInterval);
+        countdownEl.innerText = '00:00:00:00';
         return;
       }
 
@@ -438,14 +419,12 @@ class SaleLandingPage extends HTMLElement {
       const minutes = Math.floor(totalSeconds / 60) % 60;
       const seconds = Math.floor(totalSeconds) % 60;
 
-      daysEl.innerText = String(days).padStart(2, '0');
-      hoursEl.innerText = String(hours).padStart(2, '0');
-      minutesEl.innerText = String(minutes).padStart(2, '0');
-      secondsEl.innerText = String(seconds).padStart(2, '0');
+      countdownEl.innerText = `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    clearInterval(this.countdownInterval); // Clear any existing interval
+    this.countdownInterval = setInterval(updateCountdown, 1000);
   }
 
   initAnimations() {
@@ -459,6 +438,10 @@ class SaleLandingPage extends HTMLElement {
     gsap.to(this.shadowRoot.querySelector('.countdown-container'), { opacity: 1, y: 0, duration: 0.8, delay: 0.9 });
     gsap.to(this.shadowRoot.querySelector('.cta-buttons'), { opacity: 1, y: 0, duration: 0.8, delay: 1.1 });
     gsap.to(this.shadowRoot.querySelector('.discount-pill'), { scale: 1, duration: 0.8, delay: 1.3, ease: 'back.out(1.7)' });
+  }
+
+  disconnectedCallback() {
+    clearInterval(this.countdownInterval);
   }
 }
 
