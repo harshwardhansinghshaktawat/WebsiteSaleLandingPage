@@ -24,7 +24,8 @@ class ProductFeaturesSection extends HTMLElement {
       cardTitles: 'Premium Quality,Innovative Design,Exclusive Offer,Customer Satisfaction,Fast Shipping,30-Day Guarantee',
       cardDescriptions: 'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.,Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.,Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.,Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.,Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.,Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.',
       cardLinks: '#quality,#design,#exclusive,#satisfaction,#shipping,#guarantee',
-      cardLinkTargets: '_self,_self,_self,_self,_self,_self'
+      cardLinkTargets: '_self,_self,_self,_self,_self,_self',
+      cardIcons: 'https://assets6.lottiefiles.com/packages/lf20_fo0ta0sy.json,https://assets5.lottiefiles.com/packages/lf20_kkflmtur.json,https://assets1.lottiefiles.com/packages/lf20_kxvke5qf.json,https://assets5.lottiefiles.com/packages/lf20_nc3vxahm.json,https://assets3.lottiefiles.com/packages/lf20_urbk83vw.json,https://assets10.lottiefiles.com/packages/lf20_ybfz1vfm.json'
     };
     this.render();
   }
@@ -34,14 +35,14 @@ class ProductFeaturesSection extends HTMLElement {
       'section-title', 'section-subtitle', 'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size',
       'title-font-family', 'subtitle-font-family', 'card-title-font-family', 'card-text-font-family',
-      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-links', 'card-link-targets'
+      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-links', 'card-link-targets', 'card-icons'
     ];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.shadowRoot) {
       const key = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-      if (['cardTitles', 'cardDescriptions', 'cardLinks', 'cardLinkTargets'].includes(key)) {
+      if (['cardTitles', 'cardDescriptions', 'cardLinks', 'cardLinkTargets', 'cardIcons'].includes(key)) {
         this.settings[key] = newValue ? newValue.split(',') : this.settings[key].split(',');
       } else {
         this.settings[key] = newValue;
@@ -55,6 +56,7 @@ class ProductFeaturesSection extends HTMLElement {
     const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
     const cardLinksArray = this.settings.cardLinks.split(',');
     const cardLinkTargetsArray = this.settings.cardLinkTargets.split(',');
+    const cardIconsArray = this.settings.cardIcons.split(',');
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -184,6 +186,7 @@ class ProductFeaturesSection extends HTMLElement {
         .feature-cta {
           margin-top: auto;
           font-weight: 600;
+          font-size: 1.1rem; /* Increased from default to make it larger */
           color: var(--primary);
           text-decoration: none;
           display: flex;
@@ -390,6 +393,7 @@ class ProductFeaturesSection extends HTMLElement {
       case 'card-descriptions':
       case 'card-links':
       case 'card-link-targets':
+      case 'card-icons':
         this.renderCards();
         this.loadLottieAnimations();
         this.initScrollAnimations();
@@ -441,15 +445,8 @@ class ProductFeaturesSection extends HTMLElement {
 
   loadLottieAnimations() {
     if (!window.lottie) return;
-    const paths = [
-      'https://assets6.lottiefiles.com/packages/lf20_fo0ta0sy.json',
-      'https://assets5.lottiefiles.com/packages/lf20_kkflmtur.json',
-      'https://assets1.lottiefiles.com/packages/lf20_kxvke5qf.json',
-      'https://assets5.lottiefiles.com/packages/lf20_nc3vxahm.json',
-      'https://assets3.lottiefiles.com/packages/lf20_urbk83vw.json',
-      'https://assets10.lottiefiles.com/packages/lf20_ybfz1vfm.json'
-    ];
-    paths.forEach((path, index) => {
+    const cardIconsArray = this.settings.cardIcons.split(',');
+    cardIconsArray.forEach((path, index) => {
       const container = this.shadowRoot.getElementById(`feature-icon-${index + 1}`);
       if (container) {
         lottie.loadAnimation({
