@@ -14,6 +14,10 @@ class ProductFeaturesSection extends HTMLElement {
       subtitleFontSize: '1.2rem',
       cardTitleFontSize: '1.5rem',
       cardTextFontSize: '1rem',
+      titleFontFamily: 'Playfair Display',
+      subtitleFontFamily: 'Montserrat',
+      cardTitleFontFamily: 'Montserrat',
+      cardTextFontFamily: 'Montserrat',
       mainCtaText: 'Shop Now While Supplies Last',
       mainCtaLink: '#shop-now',
       mainCtaTarget: '_self',
@@ -28,8 +32,9 @@ class ProductFeaturesSection extends HTMLElement {
   static get observedAttributes() {
     return [
       'section-title', 'section-subtitle', 'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
-      'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size', 'main-cta-text', 'main-cta-link', 'main-cta-target',
-      'card-titles', 'card-descriptions', 'card-links', 'card-link-targets'
+      'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size',
+      'title-font-family', 'subtitle-font-family', 'card-title-font-family', 'card-text-font-family',
+      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-links', 'card-link-targets'
     ];
   }
 
@@ -94,7 +99,7 @@ class ProductFeaturesSection extends HTMLElement {
           z-index: 2;
         }
         .section-title {
-          font-family: 'Playfair Display', serif;
+          font-family: ${this.settings.titleFontFamily}, serif;
           font-size: ${this.settings.titleFontSize};
           font-weight: 900;
           margin-bottom: 1.5rem;
@@ -108,6 +113,7 @@ class ProductFeaturesSection extends HTMLElement {
           color: transparent;
         }
         .section-subtitle {
+          font-family: ${this.settings.subtitleFontFamily}, sans-serif;
           font-size: ${this.settings.subtitleFontSize};
           color: var(--text-light);
           max-width: 800px;
@@ -163,11 +169,13 @@ class ProductFeaturesSection extends HTMLElement {
           position: relative;
         }
         .feature-title {
+          font-family: ${this.settings.cardTitleFontFamily}, sans-serif;
           font-size: ${this.settings.cardTitleFontSize};
           font-weight: 700;
           margin-bottom: 1rem;
         }
         .feature-description {
+          font-family: ${this.settings.cardTextFontFamily}, sans-serif;
           color: var(--text-light);
           font-size: ${this.settings.cardTextFontSize};
           line-height: 1.6;
@@ -356,6 +364,18 @@ class ProductFeaturesSection extends HTMLElement {
         break;
       case 'card-text-font-size':
         this.shadowRoot.querySelectorAll('.feature-description').forEach(el => el.style.fontSize = this.settings.cardTextFontSize);
+        break;
+      case 'title-font-family':
+        this.shadowRoot.querySelector('.section-title').style.fontFamily = `${this.settings.titleFontFamily}, serif`;
+        break;
+      case 'subtitle-font-family':
+        this.shadowRoot.querySelector('.section-subtitle').style.fontFamily = `${this.settings.subtitleFontFamily}, sans-serif`;
+        break;
+      case 'card-title-font-family':
+        this.shadowRoot.querySelectorAll('.feature-title').forEach(el => el.style.fontFamily = `${this.settings.cardTitleFontFamily}, sans-serif`);
+        break;
+      case 'card-text-font-family':
+        this.shadowRoot.querySelectorAll('.feature-description').forEach(el => el.style.fontFamily = `${this.settings.cardTextFontFamily}, sans-serif`);
         break;
       case 'main-cta-text':
         this.shadowRoot.querySelector('.main-cta').textContent = this.settings.mainCtaText;
