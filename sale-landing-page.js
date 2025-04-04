@@ -7,9 +7,10 @@ class SaleLandingPage extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'badge-text', 'title-text', 'subtitle-text', 'primary-color', 'secondary-color',
-      'accent-color', 'text-color', 'background-color', 'title-font-size', 'subtitle-font-size',
-      'countdown-font-size', 'discount-text'
+      'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-days',
+      'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
+      'title-font-size', 'subtitle-font-size', 'countdown-font-size',
+      'badge-font-family', 'title-font-family', 'subtitle-font-family', 'discount-font-family'
     ];
   }
 
@@ -80,9 +81,10 @@ class SaleLandingPage extends HTMLElement {
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 1.5rem;
+          font-family: ${this.getAttribute('badge-font-family') || 'Montserrat'};
         }
         .hero-title {
-          font-family: 'Playfair Display', serif;
+          font-family: ${this.getAttribute('title-font-family') || 'Playfair Display'};
           font-size: ${this.getAttribute('title-font-size') || '3.5rem'};
           font-weight: 900;
           line-height: 1.1;
@@ -93,6 +95,7 @@ class SaleLandingPage extends HTMLElement {
           color: transparent;
         }
         .hero-subtitle {
+          font-family: ${this.getAttribute('subtitle-font-family') || 'Montserrat'};
           font-size: ${this.getAttribute('subtitle-font-size') || '1.25rem'};
           font-weight: 400;
           line-height: 1.6;
@@ -168,6 +171,7 @@ class SaleLandingPage extends HTMLElement {
           justify-content: center;
           z-index: 20;
           box-shadow: var(--shadow);
+          font-family: ${this.getAttribute('discount-font-family') || 'Montserrat'};
         }
         .shape {
           position: absolute;
@@ -226,7 +230,6 @@ class SaleLandingPage extends HTMLElement {
       </section>
     `;
 
-    // Load external scripts dynamically
     this.loadScripts();
     this.initCountdown();
   }
@@ -293,8 +296,9 @@ class SaleLandingPage extends HTMLElement {
   }
 
   initCountdown() {
+    const countdownDays = parseInt(this.getAttribute('countdown-days')) || 7;
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 7);
+    endDate.setDate(endDate.getDate() + countdownDays);
 
     const daysEl = this.shadowRoot.getElementById('days');
     const hoursEl = this.shadowRoot.getElementById('hours');
