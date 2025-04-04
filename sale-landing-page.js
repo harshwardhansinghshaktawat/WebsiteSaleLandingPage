@@ -7,7 +7,7 @@ class SaleLandingPage extends HTMLElement {
       titleText: 'Exclusive Spring Sale <br>Up To 70% Off',
       subtitleText: 'Don\'t miss out on our biggest sale of the season.',
       discountText: '-70%',
-      countdownDays: '7',
+      countdownTime: '07:00:00:00', // Default: 7 days
       primaryColor: '#ff3366',
       secondaryColor: '#5e17eb',
       accentColor: '#00c9ff',
@@ -30,7 +30,7 @@ class SaleLandingPage extends HTMLElement {
 
   static get observedAttributes() {
     return [
-      'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-days',
+      'badge-text', 'title-text', 'subtitle-text', 'discount-text', 'countdown-time',
       'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'countdown-font-size',
       'badge-font-family', 'title-font-family', 'subtitle-font-family', 'discount-font-family',
@@ -289,7 +289,7 @@ class SaleLandingPage extends HTMLElement {
       case 'discount-text':
         this.shadowRoot.querySelector('.discount-pill').textContent = this.settings.discountText;
         break;
-      case 'countdown-days':
+      case 'countdown-time':
         this.initCountdown();
         break;
       case 'title-font-size':
@@ -393,10 +393,16 @@ class SaleLandingPage extends HTMLElement {
 
   initCountdown() {
     let endDate = sessionStorage.getItem('countdownEndDate');
-    if (!endDate) {
-      endDate = new Date();
-      endDate.setDate(endDate.getDate() + parseInt(this.settings.countdownDays));
+    const now = new Date(); // Browser's local time
+
+    if (!endDate || this.settings.countdownTime !== sessionStorage.getItem('lastCountdownTime')) {
+      // Parse DD:HH:MM:SS format
+      const [days, hours, minutes, seconds] = this.settings.countdownTime.split(':').map(Number);
+      const totalSeconds = (days * 86400) + (hours * 3600) + (minutes * 60) + seconds;
+
+      endDate = new Date(now.getTime() + totalSeconds * 1000); // Set end date from now
       sessionStorage.setItem('countdownEndDate', endDate.toISOString());
+      sessionStorage.setItem('lastCountdownTime', this.settings.countdownTime);
     } else {
       endDate = new Date(endDate);
     }
@@ -405,7 +411,7 @@ class SaleLandingPage extends HTMLElement {
     if (!countdownEl) return;
 
     const updateCountdown = () => {
-      const currentDate = new Date();
+      const currentDate = new Date(); // Browser's local time
       const totalSeconds = (endDate - currentDate) / 1000;
 
       if (totalSeconds <= 0) {
@@ -414,10 +420,10 @@ class SaleLandingPage extends HTMLElement {
         return;
       }
 
-      const days = Math.floor(totalSeconds / 3600 / 24);
-      const hours = Math.floor(totalSeconds / 3600) % 24;
-      const minutes = Math.floor(totalSeconds / 60) % 60;
-      const seconds = Math.floor(totalSeconds) % 60;
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = Math.floor(totalSeconds % 60);
 
       countdownEl.innerText = `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
