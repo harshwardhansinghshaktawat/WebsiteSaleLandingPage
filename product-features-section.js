@@ -27,7 +27,13 @@ class ProductFeaturesSection extends HTMLElement {
       cardLinkTargets: '_self,_self,_self,_self,_self,_self',
       cardIcons: 'https://assets6.lottiefiles.com/packages/lf20_fo0ta0sy.json,https://assets5.lottiefiles.com/packages/lf20_kkflmtur.json,https://assets1.lottiefiles.com/packages/lf20_kxvke5qf.json,https://assets5.lottiefiles.com/packages/lf20_nc3vxahm.json,https://assets3.lottiefiles.com/packages/lf20_urbk83vw.json,https://assets10.lottiefiles.com/packages/lf20_ybfz1vfm.json'
     };
+    this.isReady = false; // Flag to track script loading
     this.render();
+    this.loadScripts().then(() => {
+      this.isReady = true;
+      this.loadLottieAnimations();
+      this.initScrollAnimations();
+    });
   }
 
   static get observedAttributes() {
@@ -56,7 +62,6 @@ class ProductFeaturesSection extends HTMLElement {
     const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
     const cardLinksArray = this.settings.cardLinks.split(',');
     const cardLinkTargetsArray = this.settings.cardLinkTargets.split(',');
-    const cardIconsArray = this.settings.cardIcons.split(',');
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -77,6 +82,10 @@ class ProductFeaturesSection extends HTMLElement {
           display: block;
           width: 100%;
           font-family: 'Montserrat', sans-serif;
+        }
+        /* Hide content until scripts are loaded */
+        .features-section:not(.loaded) {
+          visibility: hidden;
         }
         * {
           margin: 0;
@@ -186,7 +195,7 @@ class ProductFeaturesSection extends HTMLElement {
         .feature-cta {
           margin-top: auto;
           font-weight: 600;
-          font-size: 1.1rem; /* Increased from default to make it larger */
+          font-size: 1.1rem;
           color: var(--primary);
           text-decoration: none;
           display: flex;
@@ -319,11 +328,11 @@ class ProductFeaturesSection extends HTMLElement {
         </div>
       </section>
     `;
-
-    this.loadScripts();
   }
 
   updateElement(name) {
+    if (!this.isReady) return; // Skip updates until scripts are loaded
+
     const rootStyle = this.shadowRoot.querySelector('style');
     if (rootStyle) {
       rootStyle.textContent = rootStyle.textContent.replace(
@@ -408,43 +417,47 @@ class ProductFeaturesSection extends HTMLElement {
     const cardLinkTargetsArray = this.settings.cardLinkTargets.split(',');
 
     const grid = this.shadowRoot.querySelector('.features-grid');
-    grid.innerHTML = cardTitlesArray.map((title, index) => `
-      <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
-        <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
-        <h3 class="feature-title">${title}</h3>
-        <p class="feature-description">${cardDescriptionsArray[index]}</p>
-        <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
-          Learn more
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-      </div>
-    `).join('');
+    if (grid) {
+      grid.innerHTML = cardTitlesArray.map((title, index) => `
+        <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
+          <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
+          <h3 class="feature-title">${title}</h3>
+          <p class="feature-description">${cardDescriptionsArray[index]}</p>
+          <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
+            Learn more
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      `).join('');
+    }
   }
 
-  loadScripts() {
+  async loadScripts() {
     const scripts = [
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js'
     ];
-    scripts.forEach((src, index) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = true;
-      script.onload = () => {
-        if (index === 2) {
-          this.loadLottieAnimations();
-          this.initScrollAnimations();
-        }
-      };
-      this.shadowRoot.appendChild(script);
-    });
+
+    const loadScript = (src) => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        this.shadowRoot.appendChild(script);
+      });
+    };
+
+    await Promise.all(scripts.map(src => loadScript(src)));
+    this.shadowRoot.querySelector('.features-section').classList.add('loaded');
   }
 
   loadLottieAnimations() {
-    if (!window.lottie) return;
+    if (!window.lottie || !this.isReady) return;
     const cardIconsArray = this.settings.cardIcons.split(',');
     cardIconsArray.forEach((path, index) => {
       const container = this.shadowRoot.getElementById(`feature-icon-${index + 1}`);
@@ -461,6 +474,7 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   initScrollAnimations() {
+    if (!this.isReady) return;
     const gsap = this.shadowRoot.host.ownerDocument.defaultView.gsap;
     const ScrollTrigger = this.shadowRoot.host.ownerDocument.defaultView.ScrollTrigger;
     if (!gsap || !ScrollTrigger) return;
@@ -471,7 +485,8 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.section-title'),
         start: 'top 80%',
-        toggleClass: 'reveal'
+        toggleClass: 'reveal',
+        once: false
       }
     });
 
@@ -479,7 +494,8 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.section-subtitle'),
         start: 'top 80%',
-        toggleClass: 'reveal'
+        toggleClass: 'reveal',
+        once: false
       }
     });
 
@@ -492,7 +508,8 @@ class ProductFeaturesSection extends HTMLElement {
           start: 'top 85%',
           onEnter: () => {
             setTimeout(() => card.classList.add('reveal'), delay * 1000);
-          }
+          },
+          once: false
         }
       });
     });
@@ -501,7 +518,8 @@ class ProductFeaturesSection extends HTMLElement {
       scrollTrigger: {
         trigger: this.shadowRoot.querySelector('.cta-container'),
         start: 'top 85%',
-        toggleClass: 'reveal'
+        toggleClass: 'reveal',
+        once: false
       }
     });
   }
