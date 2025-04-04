@@ -2,7 +2,8 @@ class SaleLandingPage extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.render();
+    this.initializeDOM();
+    this.loadScripts();
   }
 
   static get observedAttributes() {
@@ -14,13 +15,7 @@ class SaleLandingPage extends HTMLElement {
     ];
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (oldValue !== newValue) {
-      this.updateStyles();
-    }
-  }
-
-  render() {
+  initializeDOM() {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -50,7 +45,7 @@ class SaleLandingPage extends HTMLElement {
         
         .hero-section {
           position: relative;
-          height: 100vh;
+          height: 100%;
           width: 100%;
           display: flex;
           align-items: center;
@@ -375,10 +370,84 @@ class SaleLandingPage extends HTMLElement {
         </div>
       </section>
     `;
+  }
 
-    this.loadScripts();
+  connectedCallback() {
     this.initCountdown();
-    this.initAnimations();
+    this.initAnimations(); // Animations will run after scripts are loaded
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue || !this.shadowRoot) return;
+
+    const rootStyle = this.shadowRoot.querySelector('style');
+    if (rootStyle) {
+      rootStyle.textContent = rootStyle.textContent.replace(
+        /:host\s*{[^}]*}/,
+        `:host {
+          --primary: ${this.getAttribute('primary-color') || '#ff3366'};
+          --primary-dark: #e61e4d;
+          --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
+          --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
+          --text: ${this.getAttribute('text-color') || '#2d3047'};
+          --text-light: #6b7280;
+          --background: ${this.getAttribute('background-color') || '#f8fafc'};
+          --white: #ffffff;
+          --black: #111111;
+          --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+          --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
+          --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.2);
+          display: block;
+          width: 100%;
+          height: 100vh;
+        }`
+      );
+    }
+
+    switch (name) {
+      case 'badge-text':
+        this.shadowRoot.querySelector('.sale-badge').textContent = newValue || 'Limited Time Offer';
+        break;
+      case 'title-text':
+        this.shadowRoot.querySelector('.hero-title').innerHTML = newValue || 'Exclusive Spring Sale <br>Up To 70% Off';
+        break;
+      case 'subtitle-text':
+        this.shadowRoot.querySelector('.hero-subtitle').textContent = newValue || 'Don\'t miss out on our biggest sale of the season. Premium quality products at unbeatable prices, available for a limited time only.';
+        break;
+      case 'discount-text':
+        this.shadowRoot.querySelector('.discount-pill').textContent = newValue || '-70%';
+        break;
+      case 'countdown-days':
+        this.initCountdown(); // Re-initialize countdown with new duration
+        break;
+      case 'title-font-size':
+        this.shadowRoot.querySelector('.hero-title').style.fontSize = newValue || '3.5rem';
+        break;
+      case 'subtitle-font-size':
+        this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = newValue || '1.25rem';
+        break;
+      case 'countdown-font-size':
+        this.shadowRoot.querySelectorAll('.countdown-value').forEach(el => {
+          el.style.fontSize = newValue || '2.5rem';
+        });
+        break;
+      case 'badge-font-family':
+        this.shadowRoot.querySelector('.sale-badge').style.fontFamily = newValue || 'Montserrat';
+        break;
+      case 'title-font-family':
+        this.shadowRoot.querySelector('.hero-title').style.fontFamily = newValue || 'Playfair Display';
+        break;
+      case 'subtitle-font-family':
+        this.shadowRoot.querySelector('.hero-subtitle').style.fontFamily = newValue || 'Montserrat';
+        break;
+      case 'discount-font-family':
+        this.shadowRoot.querySelector('.discount-pill').style.fontFamily = newValue || 'Montserrat';
+        break;
+      case 'background-color':
+        this.shadowRoot.querySelector('.hero-section').style.backgroundColor = newValue || '#f8fafc';
+        break;
+    }
   }
 
   loadScripts() {
@@ -387,12 +456,14 @@ class SaleLandingPage extends HTMLElement {
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js'
     ];
+    let loadedCount = 0;
     scripts.forEach(src => {
       const script = document.createElement('script');
       script.src = src;
       script.onload = () => {
+        loadedCount++;
         if (src.includes('three.min.js')) this.initWebGLBackground();
-        // Animations are initialized after render
+        if (loadedCount === scripts.length) this.initAnimations();
       };
       this.shadowRoot.appendChild(script);
     });
@@ -400,6 +471,8 @@ class SaleLandingPage extends HTMLElement {
 
   initWebGLBackground() {
     const container = this.shadowRoot.getElementById('webgl-background');
+    if (!container || !window.THREE) return;
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -469,6 +542,8 @@ class SaleLandingPage extends HTMLElement {
     const minutesEl = this.shadowRoot.getElementById('minutes');
     const secondsEl = this.shadowRoot.getElementById('seconds');
 
+    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
     const updateCountdown = () => {
       const currentDate = new Date();
       const totalSeconds = (endDate - currentDate) / 1000;
@@ -499,7 +574,8 @@ class SaleLandingPage extends HTMLElement {
 
   initAnimations() {
     const gsap = this.shadowRoot.host.ownerDocument.defaultView.gsap;
-    if (!gsap) return; // Ensure GSAP is loaded
+    if (!gsap) return;
+
     gsap.registerPlugin(this.shadowRoot.host.ownerDocument.defaultView.ScrollTrigger);
 
     gsap.to(this.shadowRoot.querySelector('.hero-content'), {
@@ -555,53 +631,6 @@ class SaleLandingPage extends HTMLElement {
       delay: 1.3,
       ease: 'back.out(1.7)'
     });
-  }
-
-  updateStyles() {
-    // Update specific elements instead of re-rendering everything
-    const rootStyle = this.shadowRoot.querySelector('style');
-    rootStyle.textContent = rootStyle.textContent.replace(
-      /:host\s*{[^}]*}/,
-      `:host {
-        --primary: ${this.getAttribute('primary-color') || '#ff3366'};
-        --primary-dark: #e61e4d;
-        --secondary: ${this.getAttribute('secondary-color') || '#5e17eb'};
-        --accent: ${this.getAttribute('accent-color') || '#00c9ff'};
-        --text: ${this.getAttribute('text-color') || '#2d3047'};
-        --text-light: #6b7280;
-        --background: ${this.getAttribute('background-color') || '#f8fafc'};
-        --white: #ffffff;
-        --black: #111111;
-        --gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        --gradient-2: linear-gradient(45deg, var(--accent) 0%, var(--secondary) 100%);
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.2);
-        display: block;
-        width: 100%;
-        height: 100vh;
-      }`
-    );
-
-    this.shadowRoot.querySelector('.sale-badge').textContent = this.getAttribute('badge-text') || 'Limited Time Offer';
-    this.shadowRoot.querySelector('.sale-badge').style.fontFamily = this.getAttribute('badge-font-family') || 'Montserrat';
-
-    this.shadowRoot.querySelector('.hero-title').innerHTML = this.getAttribute('title-text') || 'Exclusive Spring Sale <br>Up To 70% Off';
-    this.shadowRoot.querySelector('.hero-title').style.fontFamily = this.getAttribute('title-font-family') || 'Playfair Display';
-    this.shadowRoot.querySelector('.hero-title').style.fontSize = this.getAttribute('title-font-size') || '3.5rem';
-
-    this.shadowRoot.querySelector('.hero-subtitle').textContent = this.getAttribute('subtitle-text') || 'Don\'t miss out on our biggest sale of the season. Premium quality products at unbeatable prices, available for a limited time only.';
-    this.shadowRoot.querySelector('.hero-subtitle').style.fontFamily = this.getAttribute('subtitle-font-family') || 'Montserrat';
-    this.shadowRoot.querySelector('.hero-subtitle').style.fontSize = this.getAttribute('subtitle-font-size') || '1.25rem';
-
-    this.shadowRoot.querySelector('.discount-pill').textContent = this.getAttribute('discount-text') || '-70%';
-    this.shadowRoot.querySelector('.discount-pill').style.fontFamily = this.getAttribute('discount-font-family') || 'Montserrat';
-
-    const countdownValues = this.shadowRoot.querySelectorAll('.countdown-value');
-    countdownValues.forEach(value => {
-      value.style.fontSize = this.getAttribute('countdown-font-size') || '2.5rem';
-    });
-
-    this.shadowRoot.querySelector('.hero-section').style.backgroundColor = this.getAttribute('background-color') || '#f8fafc';
   }
 }
 
