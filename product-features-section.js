@@ -82,7 +82,7 @@ class ProductFeaturesSection extends HTMLElement {
       { title: this.settings.card4Title, description: this.settings.card4Description, iconUrl: this.settings.card4IconUrl, buttonLink: this.settings.card4ButtonLink },
       { title: this.settings.card5Title, description: this.settings.card5Description, iconUrl: this.settings.card5IconUrl, buttonLink: this.settings.card5ButtonLink },
       { title: this.settings.card6Title, description: this.settings.card6Description, iconUrl: this.settings.card6IconUrl, buttonLink: this.settings.card6ButtonLink }
-    ].filter(card => card.title); // Only render cards with a title
+    ].filter(card => card.title);
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -132,12 +132,6 @@ class ProductFeaturesSection extends HTMLElement {
           font-size: ${this.settings.titleFontSize};
           font-weight: 900;
           margin-bottom: 1.5rem;
-        }
-        .section-title span {
-          background-image: var(--gradient-1);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
         }
         .section-subtitle {
           font-family: ${this.settings.subtitleFontFamily}, sans-serif;
@@ -314,7 +308,7 @@ class ProductFeaturesSection extends HTMLElement {
         <div class="shape shape-4"></div>
         <div class="section-container">
           <div class="section-header">
-            <h2 class="section-title">${this.settings.sectionTitle.replace('<br>', ' ')} <span>Stand Out</span></h2>
+            <h2 class="section-title">${this.settings.sectionTitle}</h2>
             <p class="section-subtitle">${this.settings.sectionSubtitle}</p>
           </div>
           <div class="features-grid">
@@ -370,7 +364,7 @@ class ProductFeaturesSection extends HTMLElement {
 
     switch (name) {
       case 'section-title':
-        this.shadowRoot.querySelector('.section-title').innerHTML = `${this.settings.sectionTitle.replace('<br>', ' ')} <span>Stand Out</span>`;
+        this.shadowRoot.querySelector('.section-title').innerHTML = this.settings.sectionTitle;
         break;
       case 'section-subtitle':
         this.shadowRoot.querySelector('.section-subtitle').textContent = this.settings.sectionSubtitle;
