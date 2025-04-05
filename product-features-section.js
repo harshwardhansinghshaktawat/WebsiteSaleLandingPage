@@ -21,10 +21,30 @@ class ProductFeaturesSection extends HTMLElement {
       mainCtaText: 'Shop Now While Supplies Last',
       mainCtaLink: '#shop-now',
       mainCtaTarget: '_self',
-      cardTitles: 'Premium Quality,Innovative Design,Exclusive Offer,Customer Satisfaction,Fast Shipping,30-Day Guarantee',
-      cardDescriptions: 'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.,Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.,Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.,Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.,Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.,Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.',
-      cardIconLinks: 'https://via.placeholder.com/120,https://via.placeholder.com/120,https://via.placeholder.com/120,https://via.placeholder.com/120,https://via.placeholder.com/120,https://via.placeholder.com/120',
-      cardButtonLinks: '#quality,#design,#exclusive,#satisfaction,#shipping,#guarantee',
+      card1Title: 'Premium Quality',
+      card1Description: 'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.',
+      card1IconUrl: 'https://via.placeholder.com/120',
+      card1ButtonLink: '#quality',
+      card2Title: 'Innovative Design',
+      card2Description: 'Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.',
+      card2IconUrl: 'https://via.placeholder.com/120',
+      card2ButtonLink: '#design',
+      card3Title: 'Exclusive Offer',
+      card3Description: 'Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.',
+      card3IconUrl: 'https://via.placeholder.com/120',
+      card3ButtonLink: '#exclusive',
+      card4Title: 'Customer Satisfaction',
+      card4Description: 'Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.',
+      card4IconUrl: 'https://via.placeholder.com/120',
+      card4ButtonLink: '#satisfaction',
+      card5Title: 'Fast Shipping',
+      card5Description: 'Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.',
+      card5IconUrl: 'https://via.placeholder.com/120',
+      card5ButtonLink: '#shipping',
+      card6Title: '30-Day Guarantee',
+      card6Description: 'Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.',
+      card6IconUrl: 'https://via.placeholder.com/120',
+      card6ButtonLink: '#guarantee',
       cardLinkTarget: '_self'
     };
     this.render();
@@ -35,27 +55,34 @@ class ProductFeaturesSection extends HTMLElement {
       'section-title', 'section-subtitle', 'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size',
       'title-font-family', 'subtitle-font-family', 'card-title-font-family', 'card-text-font-family',
-      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-icon-links', 'card-button-links', 'card-link-target'
+      'main-cta-text', 'main-cta-link', 'main-cta-target',
+      'card1-title', 'card1-description', 'card1-icon-url', 'card1-button-link',
+      'card2-title', 'card2-description', 'card2-icon-url', 'card2-button-link',
+      'card3-title', 'card3-description', 'card3-icon-url', 'card3-button-link',
+      'card4-title', 'card4-description', 'card4-icon-url', 'card4-button-link',
+      'card5-title', 'card5-description', 'card5-icon-url', 'card5-button-link',
+      'card6-title', 'card6-description', 'card6-icon-url', 'card6-button-link',
+      'card-link-target'
     ];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.shadowRoot) {
       const key = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-      if (['cardTitles', 'cardDescriptions', 'cardIconLinks', 'cardButtonLinks'].includes(key)) {
-        this.settings[key] = newValue ? newValue.split(',') : this.settings[key].split(',');
-      } else {
-        this.settings[key] = newValue;
-      }
+      this.settings[key] = newValue;
       this.updateElement(name);
     }
   }
 
   render() {
-    const cardTitlesArray = this.settings.cardTitles.split(',');
-    const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
-    const cardIconLinksArray = this.settings.cardIconLinks.split(',');
-    const cardButtonLinksArray = this.settings.cardButtonLinks.split(',');
+    const cards = [
+      { title: this.settings.card1Title, description: this.settings.card1Description, iconUrl: this.settings.card1IconUrl, buttonLink: this.settings.card1ButtonLink },
+      { title: this.settings.card2Title, description: this.settings.card2Description, iconUrl: this.settings.card2IconUrl, buttonLink: this.settings.card2ButtonLink },
+      { title: this.settings.card3Title, description: this.settings.card3Description, iconUrl: this.settings.card3IconUrl, buttonLink: this.settings.card3ButtonLink },
+      { title: this.settings.card4Title, description: this.settings.card4Description, iconUrl: this.settings.card4IconUrl, buttonLink: this.settings.card4ButtonLink },
+      { title: this.settings.card5Title, description: this.settings.card5Description, iconUrl: this.settings.card5IconUrl, buttonLink: this.settings.card5ButtonLink },
+      { title: this.settings.card6Title, description: this.settings.card6Description, iconUrl: this.settings.card6IconUrl, buttonLink: this.settings.card6ButtonLink }
+    ].filter(card => card.title); // Only render cards with a title
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -291,14 +318,14 @@ class ProductFeaturesSection extends HTMLElement {
             <p class="section-subtitle">${this.settings.sectionSubtitle}</p>
           </div>
           <div class="features-grid">
-            ${cardTitlesArray.map((title, index) => `
+            ${cards.map((card, index) => `
               <div class="feature-card">
                 <div class="feature-icon-container">
-                  <img src="${cardIconLinksArray[index]}" alt="Card ${index + 1} Icon" class="feature-icon">
+                  <img src="${card.iconUrl}" alt="Card ${index + 1} Icon" class="feature-icon">
                 </div>
-                <h3 class="feature-title">${title}</h3>
-                <p class="feature-description">${cardDescriptionsArray[index]}</p>
-                <a href="${cardButtonLinksArray[index]}" target="${this.settings.cardLinkTarget}" class="feature-cta">
+                <h3 class="feature-title">${card.title}</h3>
+                <p class="feature-description">${card.description}</p>
+                <a href="${card.buttonLink}" target="${this.settings.cardLinkTarget}" class="feature-cta">
                   Learn more
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -381,32 +408,34 @@ class ProductFeaturesSection extends HTMLElement {
       case 'main-cta-target':
         this.shadowRoot.querySelector('.main-cta').target = this.settings.mainCtaTarget;
         break;
-      case 'card-titles':
-      case 'card-descriptions':
-      case 'card-icon-links':
-      case 'card-button-links':
-      case 'card-link-target':
-        this.renderCards();
+      default:
+        if (name.startsWith('card')) {
+          this.renderCards();
+        }
         break;
     }
   }
 
   renderCards() {
-    const cardTitlesArray = this.settings.cardTitles.split(',');
-    const cardDescriptionsArray = this.settings.cardDescriptions.split(',');
-    const cardIconLinksArray = this.settings.cardIconLinks.split(',');
-    const cardButtonLinksArray = this.settings.cardButtonLinks.split(',');
+    const cards = [
+      { title: this.settings.card1Title, description: this.settings.card1Description, iconUrl: this.settings.card1IconUrl, buttonLink: this.settings.card1ButtonLink },
+      { title: this.settings.card2Title, description: this.settings.card2Description, iconUrl: this.settings.card2IconUrl, buttonLink: this.settings.card2ButtonLink },
+      { title: this.settings.card3Title, description: this.settings.card3Description, iconUrl: this.settings.card3IconUrl, buttonLink: this.settings.card3ButtonLink },
+      { title: this.settings.card4Title, description: this.settings.card4Description, iconUrl: this.settings.card4IconUrl, buttonLink: this.settings.card4ButtonLink },
+      { title: this.settings.card5Title, description: this.settings.card5Description, iconUrl: this.settings.card5IconUrl, buttonLink: this.settings.card5ButtonLink },
+      { title: this.settings.card6Title, description: this.settings.card6Description, iconUrl: this.settings.card6IconUrl, buttonLink: this.settings.card6ButtonLink }
+    ].filter(card => card.title);
 
     const grid = this.shadowRoot.querySelector('.features-grid');
     if (grid) {
-      grid.innerHTML = cardTitlesArray.map((title, index) => `
+      grid.innerHTML = cards.map((card, index) => `
         <div class="feature-card">
           <div class="feature-icon-container">
-            <img src="${cardIconLinksArray[index]}" alt="Card ${index + 1} Icon" class="feature-icon">
+            <img src="${card.iconUrl}" alt="Card ${index + 1} Icon" class="feature-icon">
           </div>
-          <h3 class="feature-title">${title}</h3>
-          <p class="feature-description">${cardDescriptionsArray[index]}</p>
-          <a href="${cardButtonLinksArray[index]}" target="${this.settings.cardLinkTarget}" class="feature-cta">
+          <h3 class="feature-title">${card.title}</h3>
+          <p class="feature-description">${card.description}</p>
+          <a href="${card.buttonLink}" target="${this.settings.cardLinkTarget}" class="feature-cta">
             Learn more
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
