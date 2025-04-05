@@ -18,17 +18,43 @@ class TestimonialsSection extends HTMLElement {
       subtitleFontFamily: 'Montserrat',
       cardTitleFontFamily: 'Montserrat',
       cardTextFontFamily: 'Montserrat',
+      visibleTestimonials: '3', // Default to 3 visible testimonials
       testimonial1Name: 'Jane Doe',
+      testimonial1Title: 'Marketing Manager',
       testimonial1Quote: 'This product transformed my daily routine—absolutely amazing quality!',
       testimonial1ImageUrl: 'https://via.placeholder.com/100',
       testimonial2Name: 'John Smith',
+      testimonial2Title: 'Software Engineer',
       testimonial2Quote: 'Fast shipping and incredible design. I’m a customer for life!',
       testimonial2ImageUrl: 'https://via.placeholder.com/100',
       testimonial3Name: 'Emily Johnson',
+      testimonial3Title: 'Graphic Designer',
       testimonial3Quote: 'The best purchase I’ve made this year. Highly recommend!',
-      testimonial3ImageUrl: 'https://via.placeholder.com/100'
+      testimonial3ImageUrl: 'https://via.placeholder.com/100',
+      testimonial4Name: 'Michael Brown',
+      testimonial4Title: 'Entrepreneur',
+      testimonial4Quote: 'Outstanding service and top-notch products!',
+      testimonial4ImageUrl: 'https://via.placeholder.com/100',
+      testimonial5Name: 'Sarah Davis',
+      testimonial5Title: 'Teacher',
+      testimonial5Quote: 'I love the attention to detail in every item.',
+      testimonial5ImageUrl: 'https://via.placeholder.com/100',
+      testimonial6Name: 'David Wilson',
+      testimonial6Title: 'Freelancer',
+      testimonial6Quote: 'Reliable and stylish—exceeded my expectations!',
+      testimonial6ImageUrl: 'https://via.placeholder.com/100',
+      testimonial7Name: 'Lisa Anderson',
+      testimonial7Title: 'Student',
+      testimonial7Quote: 'Affordable luxury that I can’t get enough of!',
+      testimonial7ImageUrl: 'https://via.placeholder.com/100',
+      testimonial8Name: 'Robert Taylor',
+      testimonial8Title: 'Consultant',
+      testimonial8Quote: 'The guarantee gave me peace of mind—great experience!',
+      testimonial8ImageUrl: 'https://via.placeholder.com/100'
     };
+    this.currentSlide = 0;
     this.render();
+    this.setupNavigation();
   }
 
   static get observedAttributes() {
@@ -36,9 +62,15 @@ class TestimonialsSection extends HTMLElement {
       'section-title', 'section-subtitle', 'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size',
       'title-font-family', 'subtitle-font-family', 'card-title-font-family', 'card-text-font-family',
-      'testimonial1-name', 'testimonial1-quote', 'testimonial1-image-url',
-      'testimonial2-name', 'testimonial2-quote', 'testimonial2-image-url',
-      'testimonial3-name', 'testimonial3-quote', 'testimonial3-image-url'
+      'visible-testimonials',
+      'testimonial1-name', 'testimonial1-title', 'testimonial1-quote', 'testimonial1-image-url',
+      'testimonial2-name', 'testimonial2-title', 'testimonial2-quote', 'testimonial2-image-url',
+      'testimonial3-name', 'testimonial3-title', 'testimonial3-quote', 'testimonial3-image-url',
+      'testimonial4-name', 'testimonial4-title', 'testimonial4-quote', 'testimonial4-image-url',
+      'testimonial5-name', 'testimonial5-title', 'testimonial5-quote', 'testimonial5-image-url',
+      'testimonial6-name', 'testimonial6-title', 'testimonial6-quote', 'testimonial6-image-url',
+      'testimonial7-name', 'testimonial7-title', 'testimonial7-quote', 'testimonial7-image-url',
+      'testimonial8-name', 'testimonial8-title', 'testimonial8-quote', 'testimonial8-image-url'
     ];
   }
 
@@ -52,10 +84,19 @@ class TestimonialsSection extends HTMLElement {
 
   render() {
     const testimonials = [
-      { name: this.settings.testimonial1Name, quote: this.settings.testimonial1Quote, imageUrl: this.settings.testimonial1ImageUrl },
-      { name: this.settings.testimonial2Name, quote: this.settings.testimonial2Quote, imageUrl: this.settings.testimonial2ImageUrl },
-      { name: this.settings.testimonial3Name, quote: this.settings.testimonial3Quote, imageUrl: this.settings.testimonial3ImageUrl }
-    ].filter(testimonial => testimonial.name && testimonial.quote); // Render only if name and quote are present
+      { name: this.settings.testimonial1Name, title: this.settings.testimonial1Title, quote: this.settings.testimonial1Quote, imageUrl: this.settings.testimonial1ImageUrl },
+      { name: this.settings.testimonial2Name, title: this.settings.testimonial2Title, quote: this.settings.testimonial2Quote, imageUrl: this.settings.testimonial2ImageUrl },
+      { name: this.settings.testimonial3Name, title: this.settings.testimonial3Title, quote: this.settings.testimonial3Quote, imageUrl: this.settings.testimonial3ImageUrl },
+      { name: this.settings.testimonial4Name, title: this.settings.testimonial4Title, quote: this.settings.testimonial4Quote, imageUrl: this.settings.testimonial4ImageUrl },
+      { name: this.settings.testimonial5Name, title: this.settings.testimonial5Title, quote: this.settings.testimonial5Quote, imageUrl: this.settings.testimonial5ImageUrl },
+      { name: this.settings.testimonial6Name, title: this.settings.testimonial6Title, quote: this.settings.testimonial6Quote, imageUrl: this.settings.testimonial6ImageUrl },
+      { name: this.settings.testimonial7Name, title: this.settings.testimonial7Title, quote: this.settings.testimonial7Quote, imageUrl: this.settings.testimonial7ImageUrl },
+      { name: this.settings.testimonial8Name, title: this.settings.testimonial8Title, quote: this.settings.testimonial8Quote, imageUrl: this.settings.testimonial8ImageUrl }
+    ].filter(testimonial => testimonial.name && testimonial.quote);
+
+    // Limit to visibleTestimonials
+    const visibleCount = Math.min(parseInt(this.settings.visibleTestimonials) || 8, 8);
+    const visibleTestimonials = testimonials.slice(0, visibleCount);
 
     // Dynamic gradient on last two words of title
     const titleWords = this.settings.sectionTitle.split(' ');
@@ -125,19 +166,23 @@ class TestimonialsSection extends HTMLElement {
           margin: 0 auto;
           line-height: 1.6;
         }
-        .testimonials-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 2.5rem;
+        .slider-container {
           position: relative;
-          z-index: 2;
+          width: 100%;
+          overflow: hidden;
+        }
+        .testimonials-slider {
+          display: flex;
+          transition: transform 0.5s ease;
+          width: ${visibleCount * 33.33}%;
         }
         .testimonial-card {
+          flex: 0 0 ${100 / visibleCount}%;
+          min-width: 300px;
           background-color: var(--white);
           border-radius: 1.5rem;
           padding: 2.5rem;
           box-shadow: var(--shadow);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -146,7 +191,6 @@ class TestimonialsSection extends HTMLElement {
           overflow: hidden;
         }
         .testimonial-card:hover {
-          transform: translateY(-10px);
           box-shadow: var(--shadow-strong);
         }
         .testimonial-card::before {
@@ -175,8 +219,14 @@ class TestimonialsSection extends HTMLElement {
           font-family: ${this.settings.cardTitleFontFamily}, sans-serif;
           font-size: ${this.settings.cardTitleFontSize};
           font-weight: 700;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
           color: var(--primary);
+        }
+        .testimonial-title {
+          font-family: ${this.settings.cardTextFontFamily}, sans-serif;
+          font-size: ${parseFloat(this.settings.cardTextFontSize) * 0.9}rem;
+          color: var(--text-light);
+          margin-bottom: 1rem;
         }
         .testimonial-quote {
           font-family: ${this.settings.cardTextFontFamily}, sans-serif;
@@ -184,6 +234,31 @@ class TestimonialsSection extends HTMLElement {
           color: var(--text-light);
           line-height: 1.6;
           font-style: italic;
+        }
+        .nav-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: var(--gradient-1);
+          color: var(--white);
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          font-size: 1.5rem;
+          cursor: pointer;
+          display: none;
+          z-index: 3;
+          transition: background 0.3s ease;
+        }
+        .nav-arrow:hover {
+          background: var(--gradient-2);
+        }
+        .nav-arrow.prev {
+          left: 10px;
+        }
+        .nav-arrow.next {
+          right: 10px;
         }
         .shape {
           position: absolute;
@@ -206,22 +281,17 @@ class TestimonialsSection extends HTMLElement {
           right: -70px;
           background: var(--accent);
         }
-        @media (max-width: 992px) {
-          .testimonials-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
         @media (max-width: 768px) {
           .section-title { font-size: 2.5rem; }
           .section-subtitle { font-size: 1rem; }
-          .testimonials-grid { grid-template-columns: 1fr; gap: 2rem; }
-          .testimonial-card { padding: 2rem; }
+          .testimonial-card { padding: 2rem; min-width: 250px; }
           .testimonial-image { width: 80px; height: 80px; }
         }
         @media (max-width: 480px) {
           .section-title { font-size: 2rem; }
           .testimonials-section { padding: 4rem 1rem; }
           .section-header { margin-bottom: 3rem; }
+          .testimonial-card { min-width: 200px; }
           .testimonial-image { width: 60px; height: 60px; }
         }
       </style>
@@ -233,18 +303,24 @@ class TestimonialsSection extends HTMLElement {
             <h2 class="section-title">${regularText ? regularText + ' ' : ''}<span>${gradientText}</span></h2>
             <p class="section-subtitle">${this.settings.sectionSubtitle}</p>
           </div>
-          <div class="testimonials-grid">
-            ${testimonials.map((testimonial, index) => `
-              <div class="testimonial-card">
-                <img src="${testimonial.imageUrl}" alt="${testimonial.name}" class="testimonial-image">
-                <h3 class="testimonial-name">${testimonial.name}</h3>
-                <p class="testimonial-quote">"${testimonial.quote}"</p>
-              </div>
-            `).join('')}
+          <div class="slider-container">
+            <button class="nav-arrow prev">&#8249;</button>
+            <div class="testimonials-slider">
+              ${visibleTestimonials.map((testimonial, index) => `
+                <div class="testimonial-card">
+                  <img src="${testimonial.imageUrl}" alt="${testimonial.name}" class="testimonial-image">
+                  <h3 class="testimonial-name">${testimonial.name}</h3>
+                  <p class="testimonial-title">${testimonial.title}</p>
+                  <p class="testimonial-quote">"${testimonial.quote}"</p>
+                </div>
+              `).join('')}
+            </div>
+            <button class="nav-arrow next">&#8250;</button>
           </div>
         </div>
       </section>
     `;
+    this.updateNavigationVisibility();
   }
 
   updateElement(name) {
@@ -294,6 +370,7 @@ class TestimonialsSection extends HTMLElement {
         break;
       case 'card-text-font-size':
         this.shadowRoot.querySelectorAll('.testimonial-quote').forEach(el => el.style.fontSize = this.settings.cardTextFontSize);
+        this.shadowRoot.querySelectorAll('.testimonial-title').forEach(el => el.style.fontSize = `${parseFloat(this.settings.cardTextFontSize) * 0.9}rem`);
         break;
       case 'title-font-family':
         this.shadowRoot.querySelector('.section-title').style.fontFamily = `${this.settings.titleFontFamily}, serif`;
@@ -306,10 +383,13 @@ class TestimonialsSection extends HTMLElement {
         break;
       case 'card-text-font-family':
         this.shadowRoot.querySelectorAll('.testimonial-quote').forEach(el => el.style.fontFamily = `${this.settings.cardTextFontFamily}, sans-serif`);
+        this.shadowRoot.querySelectorAll('.testimonial-title').forEach(el => el.style.fontFamily = `${this.settings.cardTextFontFamily}, sans-serif`);
         break;
+      case 'visible-testimonials':
       default:
-        if (name.startsWith('testimonial')) {
+        if (name.startsWith('testimonial') || name === 'visible-testimonials') {
           this.renderTestimonials();
+          this.setupNavigation();
         }
         break;
     }
@@ -317,20 +397,86 @@ class TestimonialsSection extends HTMLElement {
 
   renderTestimonials() {
     const testimonials = [
-      { name: this.settings.testimonial1Name, quote: this.settings.testimonial1Quote, imageUrl: this.settings.testimonial1ImageUrl },
-      { name: this.settings.testimonial2Name, quote: this.settings.testimonial2Quote, imageUrl: this.settings.testimonial2ImageUrl },
-      { name: this.settings.testimonial3Name, quote: this.settings.testimonial3Quote, imageUrl: this.settings.testimonial3ImageUrl }
+      { name: this.settings.testimonial1Name, title: this.settings.testimonial1Title, quote: this.settings.testimonial1Quote, imageUrl: this.settings.testimonial1ImageUrl },
+      { name: this.settings.testimonial2Name, title: this.settings.testimonial2Title, quote: this.settings.testimonial2Quote, imageUrl: this.settings.testimonial2ImageUrl },
+      { name: this.settings.testimonial3Name, title: this.settings.testimonial3Title, quote: this.settings.testimonial3Quote, imageUrl: this.settings.testimonial3ImageUrl },
+      { name: this.settings.testimonial4Name, title: this.settings.testimonial4Title, quote: this.settings.testimonial4Quote, imageUrl: this.settings.testimonial4ImageUrl },
+      { name: this.settings.testimonial5Name, title: this.settings.testimonial5Title, quote: this.settings.testimonial5Quote, imageUrl: this.settings.testimonial5ImageUrl },
+      { name: this.settings.testimonial6Name, title: this.settings.testimonial6Title, quote: this.settings.testimonial6Quote, imageUrl: this.settings.testimonial6ImageUrl },
+      { name: this.settings.testimonial7Name, title: this.settings.testimonial7Title, quote: this.settings.testimonial7Quote, imageUrl: this.settings.testimonial7ImageUrl },
+      { name: this.settings.testimonial8Name, title: this.settings.testimonial8Title, quote: this.settings.testimonial8Quote, imageUrl: this.settings.testimonial8ImageUrl }
     ].filter(testimonial => testimonial.name && testimonial.quote);
 
-    const grid = this.shadowRoot.querySelector('.testimonials-grid');
-    if (grid) {
-      grid.innerHTML = testimonials.map((testimonial, index) => `
+    const visibleCount = Math.min(parseInt(this.settings.visibleTestimonials) || 8, 8);
+    const visibleTestimonials = testimonials.slice(0, visibleCount);
+
+    const slider = this.shadowRoot.querySelector('.testimonials-slider');
+    if (slider) {
+      slider.style.width = `${visibleCount * 33.33}%`;
+      slider.innerHTML = visibleTestimonials.map((testimonial, index) => `
         <div class="testimonial-card">
           <img src="${testimonial.imageUrl}" alt="${testimonial.name}" class="testimonial-image">
           <h3 class="testimonial-name">${testimonial.name}</h3>
+          <p class="testimonial-title">${testimonial.title}</p>
           <p class="testimonial-quote">"${testimonial.quote}"</p>
         </div>
       `).join('');
+      this.updateSlidePosition();
+      this.updateNavigationVisibility();
+    }
+  }
+
+  setupNavigation() {
+    const prevButton = this.shadowRoot.querySelector('.nav-arrow.prev');
+    const nextButton = this.shadowRoot.querySelector('.nav-arrow.next');
+    const slider = this.shadowRoot.querySelector('.testimonials-slider');
+    const visibleCount = Math.min(parseInt(this.settings.visibleTestimonials) || 8, 8);
+
+    if (!prevButton || !nextButton || !slider) return;
+
+    prevButton.onclick = () => {
+      if (this.currentSlide > 0) {
+        this.currentSlide--;
+        this.updateSlidePosition();
+      }
+    };
+
+    nextButton.onclick = () => {
+      const maxSlide = Math.max(0, visibleCount - this.getVisibleSlidesCount());
+      if (this.currentSlide < maxSlide) {
+        this.currentSlide++;
+        this.updateSlidePosition();
+      }
+    };
+
+    this.updateNavigationVisibility();
+  }
+
+  updateSlidePosition() {
+    const slider = this.shadowRoot.querySelector('.testimonials-slider');
+    if (slider) {
+      const slideWidth = 100 / Math.min(parseInt(this.settings.visibleTestimonials) || 8, 8);
+      slider.style.transform = `translateX(-${this.currentSlide * slideWidth}%)`;
+      this.updateNavigationVisibility();
+    }
+  }
+
+  getVisibleSlidesCount() {
+    const containerWidth = this.shadowRoot.querySelector('.slider-container')?.offsetWidth || 1200;
+    const cardWidth = 300; // Minimum width of testimonial-card
+    return Math.floor(containerWidth / cardWidth);
+  }
+
+  updateNavigationVisibility() {
+    const prevButton = this.shadowRoot.querySelector('.nav-arrow.prev');
+    const nextButton = this.shadowRoot.querySelector('.nav-arrow.next');
+    const visibleCount = Math.min(parseInt(this.settings.visibleTestimonials) || 8, 8);
+    const visibleSlides = this.getVisibleSlidesCount();
+
+    if (prevButton && nextButton) {
+      const needsNavigation = visibleCount > visibleSlides;
+      prevButton.style.display = needsNavigation && this.currentSlide > 0 ? 'block' : 'none';
+      nextButton.style.display = needsNavigation && this.currentSlide < (visibleCount - visibleSlides) ? 'block' : 'none';
     }
   }
 }
