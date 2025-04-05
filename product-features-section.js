@@ -3,7 +3,7 @@ class ProductFeaturesSection extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.settings = {
-      sectionTitle: 'Why Our Products <br>Stand Out',
+      sectionTitle: 'Why Our Products Stand Out',
       sectionSubtitle: 'Discover the exceptional quality and value that sets our products apart. Each item is crafted with premium materials and innovative design for an unparalleled experience.',
       primaryColor: '#ff3366',
       secondaryColor: '#5e17eb',
@@ -84,6 +84,11 @@ class ProductFeaturesSection extends HTMLElement {
       { title: this.settings.card6Title, description: this.settings.card6Description, iconUrl: this.settings.card6IconUrl, buttonLink: this.settings.card6ButtonLink }
     ].filter(card => card.title);
 
+    // Split title into words and apply gradient to last two words
+    const titleWords = this.settings.sectionTitle.split(' ');
+    const regularText = titleWords.slice(0, -2).join(' ');
+    const gradientText = titleWords.slice(-2).join(' ');
+
     this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -132,6 +137,12 @@ class ProductFeaturesSection extends HTMLElement {
           font-size: ${this.settings.titleFontSize};
           font-weight: 900;
           margin-bottom: 1.5rem;
+        }
+        .section-title span {
+          background-image: var(--gradient-1);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
         }
         .section-subtitle {
           font-family: ${this.settings.subtitleFontFamily}, sans-serif;
@@ -308,7 +319,7 @@ class ProductFeaturesSection extends HTMLElement {
         <div class="shape shape-4"></div>
         <div class="section-container">
           <div class="section-header">
-            <h2 class="section-title">${this.settings.sectionTitle}</h2>
+            <h2 class="section-title">${regularText ? regularText + ' ' : ''}<span>${gradientText}</span></h2>
             <p class="section-subtitle">${this.settings.sectionSubtitle}</p>
           </div>
           <div class="features-grid">
@@ -364,7 +375,10 @@ class ProductFeaturesSection extends HTMLElement {
 
     switch (name) {
       case 'section-title':
-        this.shadowRoot.querySelector('.section-title').innerHTML = this.settings.sectionTitle;
+        const titleWords = this.settings.sectionTitle.split(' ');
+        const regularText = titleWords.slice(0, -2).join(' ');
+        const gradientText = titleWords.slice(-2).join(' ');
+        this.shadowRoot.querySelector('.section-title').innerHTML = `${regularText ? regularText + ' ' : ''}<span>${gradientText}</span>`;
         break;
       case 'section-subtitle':
         this.shadowRoot.querySelector('.section-subtitle').textContent = this.settings.sectionSubtitle;
