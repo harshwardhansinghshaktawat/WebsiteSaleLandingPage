@@ -24,14 +24,10 @@ class ProductFeaturesSection extends HTMLElement {
       cardTitles: 'Premium Quality,Innovative Design,Exclusive Offer,Customer Satisfaction,Fast Shipping,30-Day Guarantee',
       cardDescriptions: 'Crafted with the finest materials and meticulous attention to detail, our products are built to last and exceed your expectations.,Our cutting-edge designs combine aesthetics with functionality, creating products that are both beautiful and practical for everyday use.,Take advantage of our limited-time pricing that makes luxury accessible. Experience premium quality at an unprecedented value.,Join thousands of satisfied customers who have made our products a part of their lives. Your satisfaction is our top priority.,Enjoy quick and reliable delivery of your purchase. We ensure your products reach you promptly and in perfect condition.,Shop with confidence knowing that all our products come with a 30-day money-back guarantee for your peace of mind.',
       cardLinks: '#quality,#design,#exclusive,#satisfaction,#shipping,#guarantee',
-      cardLinkTargets: '_self,_self,_self,_self,_self,_self',
-      cardIcons: 'https://assets6.lottiefiles.com/packages/lf20_fo0ta0sy.json,https://assets5.lottiefiles.com/packages/lf20_kkflmtur.json,https://assets1.lottiefiles.com/packages/lf20_kxvke5qf.json,https://assets5.lottiefiles.com/packages/lf20_nc3vxahm.json,https://assets3.lottiefiles.com/packages/lf20_urbk83vw.json,https://assets10.lottiefiles.com/packages/lf20_ybfz1vfm.json'
+      cardLinkTargets: '_self,_self,_self,_self,_self,_self'
     };
-    this.loadScripts().then(() => {
-      this.render();
-      this.loadLottieAnimations();
-      this.initScrollAnimations();
-    }).catch(err => console.error('Script loading failed:', err));
+    this.render();
+    console.log('Custom element constructed and rendered'); // Debug log
   }
 
   static get observedAttributes() {
@@ -39,14 +35,15 @@ class ProductFeaturesSection extends HTMLElement {
       'section-title', 'section-subtitle', 'primary-color', 'secondary-color', 'accent-color', 'text-color', 'background-color',
       'title-font-size', 'subtitle-font-size', 'card-title-font-size', 'card-text-font-size',
       'title-font-family', 'subtitle-font-family', 'card-title-font-family', 'card-text-font-family',
-      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-links', 'card-link-targets', 'card-icons'
+      'main-cta-text', 'main-cta-link', 'main-cta-target', 'card-titles', 'card-descriptions', 'card-links', 'card-link-targets'
     ];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.shadowRoot) {
+      console.log(`Attribute changed: ${name} from ${oldValue} to ${newValue}`); // Debug log
       const key = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-      if (['cardTitles', 'cardDescriptions', 'cardLinks', 'cardLinkTargets', 'cardIcons'].includes(key)) {
+      if (['cardTitles', 'cardDescriptions', 'cardLinks', 'cardLinkTargets'].includes(key)) {
         this.settings[key] = newValue ? newValue.split(',') : this.settings[key].split(',');
       } else {
         this.settings[key] = newValue;
@@ -92,6 +89,7 @@ class ProductFeaturesSection extends HTMLElement {
           overflow: hidden;
           background-color: var(--background);
           color: var(--text);
+          min-height: 200px;
         }
         .section-container {
           max-width: 1200px;
@@ -108,8 +106,6 @@ class ProductFeaturesSection extends HTMLElement {
           font-size: ${this.settings.titleFontSize};
           font-weight: 900;
           margin-bottom: 1.5rem;
-          opacity: 0;
-          transform: translateY(30px);
         }
         .section-title span {
           background-image: var(--gradient-1);
@@ -124,8 +120,6 @@ class ProductFeaturesSection extends HTMLElement {
           max-width: 800px;
           margin: 0 auto;
           line-height: 1.6;
-          opacity: 0;
-          transform: translateY(30px);
         }
         .features-grid {
           display: grid;
@@ -146,8 +140,6 @@ class ProductFeaturesSection extends HTMLElement {
           text-align: center;
           position: relative;
           overflow: hidden;
-          opacity: 0;
-          transform: translateY(50px);
         }
         .feature-card:hover {
           transform: translateY(-10px);
@@ -171,7 +163,14 @@ class ProductFeaturesSection extends HTMLElement {
           width: 120px;
           height: 120px;
           margin-bottom: 1.5rem;
-          position: relative;
+          background-color: var(--accent);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--white);
+          font-size: 2rem;
+          font-weight: bold;
         }
         .feature-title {
           font-family: ${this.settings.cardTitleFontFamily}, sans-serif;
@@ -209,8 +208,6 @@ class ProductFeaturesSection extends HTMLElement {
         .cta-container {
           margin-top: 5rem;
           text-align: center;
-          opacity: 0;
-          transform: translateY(30px);
           position: relative;
           z-index: 2;
         }
@@ -287,11 +284,6 @@ class ProductFeaturesSection extends HTMLElement {
           .section-header { margin-bottom: 3rem; }
           .feature-icon-container { width: 80px; height: 80px; }
         }
-        .reveal {
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
       </style>
       <section class="features-section">
         <div class="shape shape-3"></div>
@@ -303,8 +295,8 @@ class ProductFeaturesSection extends HTMLElement {
           </div>
           <div class="features-grid">
             ${cardTitlesArray.map((title, index) => `
-              <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
-                <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
+              <div class="feature-card">
+                <div class="feature-icon-container">${index + 1}</div>
                 <h3 class="feature-title">${title}</h3>
                 <p class="feature-description">${cardDescriptionsArray[index]}</p>
                 <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
@@ -325,6 +317,7 @@ class ProductFeaturesSection extends HTMLElement {
   }
 
   updateElement(name) {
+    console.log(`Updating element for: ${name}`); // Debug log
     const rootStyle = this.shadowRoot.querySelector('style');
     if (rootStyle) {
       rootStyle.textContent = rootStyle.textContent.replace(
@@ -394,10 +387,7 @@ class ProductFeaturesSection extends HTMLElement {
       case 'card-descriptions':
       case 'card-links':
       case 'card-link-targets':
-      case 'card-icons':
         this.renderCards();
-        this.loadLottieAnimations();
-        this.initScrollAnimations();
         break;
     }
   }
@@ -411,8 +401,8 @@ class ProductFeaturesSection extends HTMLElement {
     const grid = this.shadowRoot.querySelector('.features-grid');
     if (grid) {
       grid.innerHTML = cardTitlesArray.map((title, index) => `
-        <div class="feature-card" data-delay="${index * 0.1 + 0.1}">
-          <div class="feature-icon-container" id="feature-icon-${index + 1}"></div>
+        <div class="feature-card">
+          <div class="feature-icon-container">${index + 1}</div>
           <h3 class="feature-title">${title}</h3>
           <p class="feature-description">${cardDescriptionsArray[index]}</p>
           <a href="${cardLinksArray[index]}" target="${cardLinkTargetsArray[index]}" class="feature-cta">
@@ -424,92 +414,6 @@ class ProductFeaturesSection extends HTMLElement {
         </div>
       `).join('');
     }
-  }
-
-  loadScripts() {
-    const scripts = [
-      'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js'
-    ];
-
-    return Promise.all(
-      scripts.map(src => {
-        return new Promise((resolve, reject) => {
-          if (document.querySelector(`script[src="${src}"]`)) {
-            resolve();
-            return;
-          }
-          const script = document.createElement('script');
-          script.src = src;
-          script.async = true;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      })
-    );
-  }
-
-  loadLottieAnimations() {
-    if (!window.lottie) return;
-    const cardIconsArray = this.settings.cardIcons.split(',');
-    cardIconsArray.forEach((path, index) => {
-      const container = this.shadowRoot.getElementById(`feature-icon-${index + 1}`);
-      if (container) {
-        lottie.loadAnimation({
-          container,
-          renderer: 'svg',
-          loop: true,
-          autoplay: true,
-          path
-        });
-      }
-    });
-  }
-
-  initScrollAnimations() {
-    if (!window.gsap || !window.ScrollTrigger) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    gsap.to(this.shadowRoot.querySelector('.section-title'), {
-      scrollTrigger: {
-        trigger: this.shadowRoot.querySelector('.section-title'),
-        start: 'top 80%',
-        toggleClass: 'reveal'
-      }
-    });
-
-    gsap.to(this.shadowRoot.querySelector('.section-subtitle'), {
-      scrollTrigger: {
-        trigger: this.shadowRoot.querySelector('.section-subtitle'),
-        start: 'top 80%',
-        toggleClass: 'reveal'
-      }
-    });
-
-    const featureCards = this.shadowRoot.querySelectorAll('.feature-card');
-    featureCards.forEach(card => {
-      const delay = card.getAttribute('data-delay');
-      gsap.to(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: 'top 85%',
-          onEnter: () => {
-            setTimeout(() => card.classList.add('reveal'), delay * 1000);
-          }
-        }
-      });
-    });
-
-    gsap.to(this.shadowRoot.querySelector('.cta-container'), {
-      scrollTrigger: {
-        trigger: this.shadowRoot.querySelector('.cta-container'),
-        start: 'top 85%',
-        toggleClass: 'reveal'
-      }
-    });
   }
 }
 
